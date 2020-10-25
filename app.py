@@ -4,6 +4,10 @@ app = Flask(__name__)
 
 app.debug = False
 
+@app.route('/sender/sign-up')
+def registration():
+    return render_template("registration.html")
+
 
 @app.route('/')
 def index():

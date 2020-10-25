@@ -1,0 +1,30 @@
+<!doctype>
+<html>
+	<head>
+		<title>Rejestracja</title>
+		<link rel="stylesheet" href="/static/main.css"></link>
+	</head>
+
+	<body>
+	
+	<nav>
+  		<a href="../">Strona główna</a> 
+  		<a href="/sender/sign-up">Rejestracja</a> 
+	</nav>
+
+	<form>
+		<ul>
+		<li id="name">
+		<input type="text" name="imie" placeholder="Nazywam się"></input>
+		</li>
+		<li id="email">
+		<input type="text" name="e-mail" placeholder="Adres e-mail"></input>
+		</li>
+		<li><input type="submit" value="Zapisz do newslettera"></input></li>
+		</ul>
+	</form>
+	
+
+	</body>
+
+</html>

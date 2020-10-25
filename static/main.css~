@@ -16,7 +16,7 @@ ul #menu {
 }
 
 nav a{
-	width: 150px;
+	width: 200px;
 	display: block;
 	padding: 10px 15px;
 	text-decoration: none;
