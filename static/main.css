@@ -1,0 +1,4 @@
+p {color: blue}
+form ul {list-style-type: none}
+form ul li#name {color:red}
+form ul li#email {color:green}
