@@ -4,23 +4,44 @@
 		<title>Rejestracja</title>
 		<link rel="stylesheet" href="/static/main.css"></link>
 	</head>
+	
+	<header>
+ 	<nav>
+    <ul id="menu">
+    
+      <li id="strona_glowna"><a href="/">Strona główna</a></li>
+      <li id="rejestracja"><a href="/sender/sign-up">Rejestracja</a> </li>
+
+    </ul>
+  	</nav>
+	</header>
 
 	<body>
-	
-	<nav>
-  		<a href="../">Strona główna</a> 
-  		<a href="/sender/sign-up">Rejestracja</a> 
-	</nav>
 
 	<form>
-		<ul>
-		<li id="name">
-		<input type="text" name="imie" placeholder="Nazywam się"></input>
+		<ul id="formularz">
+		<li id="imie">
+		Imię: <input type="text" name="imie"></input>
+		</li>
+		<li id="nazwisko">
+		Nazwisko:<input type="text" name="nazwisko"></input>
 		</li>
 		<li id="email">
-		<input type="text" name="e-mail" placeholder="Adres e-mail"></input>
+		Adres e-mail: <input type="text" name="email"></input>
 		</li>
-		<li><input type="submit" value="Zapisz do newslettera"></input></li>
+		<li id="login">
+		Login: <input type="text" name="login"></input>
+		</li>
+		<li id="haslo">
+		Hasło: <input type="password" name="haslo"></input>
+		</li>
+		<li id="powtorz_haslo">
+		Powtórz hasło: <input type="password" name="powtorz_haslo"></input>
+		</li>
+		<li id="zdjecie">
+		Zdjęcie: <input type="file" name="zdjecie" accept="image/png, image/jpg"></input>
+		</li>
+		<li><input type="submit" value="Zarejestruj"></input></li>
 		</ul>
 	</form>
 	

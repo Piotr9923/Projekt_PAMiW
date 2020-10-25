@@ -1,12 +1,17 @@
+html{
+	background-color: #FFE7E7;
+}
+
 p {
 	color: red;
 	text-align: center;
 }
 
-nav{
-	width: 100%;
-	background: black;
+nav ul{
+	width: 97%;
+	background: green;
 	overflow: auto;
+	list-style: none;
 }
 
 ul #menu {
@@ -16,7 +21,7 @@ ul #menu {
 }
 
 nav a{
-	width: 200px;
+	width: 150px;
 	display: block;
 	padding: 10px 15px;
 	text-decoration: none;
@@ -25,16 +30,13 @@ nav a{
 	text-align: center;
 }
 
-li{
+nav ul li{
 	float: left;
-
 }
 
 	
-form ul li#name {
-	color:red
+form ul li{
+	list-style: none;
+	float: inherit;
 	}
 	
-form ul li#email {
-	color:green
-	}
