@@ -24,10 +24,10 @@
 
 	<form id="formularz" method="POST" action="https://infinite-hamlet-29399.herokuapp.com/sender/register" enctype="multipart/form-data" >
 		<ul id="formularz">
-			<li>Imię: <input type="text" id="firstname"/></input>	
+			<li>Imię: <input type="text" id="firstname" name="firstname"/></input>	
 			<a href="#" class="tool" tresc="Imię musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img src="/static/images/help.svg"></a></li>
 		<li>
-		Nazwisko:<input type="text"  id="lastname"/></input>
+		Nazwisko:<input type="text"  id="lastname" name="lastname"/></input>
 		<a href="#" class="tool" tresc="Nazwisko musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img src="/static/images/help.svg"></a>
 		</li>
 		<li id="plec">
