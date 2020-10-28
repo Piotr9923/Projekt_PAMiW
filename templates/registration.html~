@@ -22,13 +22,13 @@
 	
 	<body>
 
-	<form id="formularz">
+	<form id="formularz" method="POST" action="https://infinite-hamlet-29399.herokuapp.com/sender/register" enctype="multipart/form-data" >
 		<ul id="formularz">
 			<li>Imię: <input type="text" id="firstname"/></input>	
-			<a href="#" class="tool" tresc="Imię musi zaczynać się z wielkiej litery i składać się co najmniej z 2 znaków!"><img src="/static/images/help.svg"></a></li>
+			<a href="#" class="tool" tresc="Imię musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img src="/static/images/help.svg"></a></li>
 		<li>
 		Nazwisko:<input type="text"  id="lastname"/></input>
-		<a href="#" class="tool" tresc="Nazwisko musi zaczynać się z wielkiej litery i składać się co najmniej z 2 znaków!"><img src="/static/images/help.svg"></a>
+		<a href="#" class="tool" tresc="Nazwisko musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img src="/static/images/help.svg"></a>
 		</li>
 		<li id="plec">
 		Płeć: <input type="radio" id="male" name="sex" value="M">Mężczyzna    	
@@ -52,7 +52,8 @@
 		</ul>
 	</form>
 	
-
+	<footer>2020 | <a href="https://github.com/Piotr9923/Projekt_PAMiW">https://github.com/Piotr9923/Projekt_PAMiW</footer>
+	
 	</body>
 
 

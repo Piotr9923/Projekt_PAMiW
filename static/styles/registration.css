@@ -111,10 +111,18 @@ a.tool:hover::before {
     bottom: -25px;
 }
 
+footer{
+	position: absolute;
+	bottom: 0;
+	text-align: center;
+	width: 100%;
+	height: 25px;
+	font-size: 15px;
+}
+
 
 .incorrect_field{
 	color: red;
-
 }
 	
 	

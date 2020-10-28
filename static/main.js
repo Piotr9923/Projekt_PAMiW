@@ -48,7 +48,7 @@ function validateFields(){
 
     var login = document.getElementById("login");
     
-    if(login.value.match(letters) && login.value.length>2 && login.value.length<13){
+    if(login.value.match(/[a-z]/) && login.value.length>2 && login.value.length<13){
         login.classList.remove("incorrect_field");
     }
     else{
@@ -59,7 +59,7 @@ function validateFields(){
     var password = document.getElementById("password");
 
     
-    if(password.value.match(password_letters) && /^[A-Z]/.test(password.value) && password.value.length>7){
+    if(password.value.match(password_letters) && /[A-Z]/.test(password.value) && password.value.length>7){
         password.classList.remove("incorrect_field");
     }
     else{
@@ -99,11 +99,7 @@ function validateFields(){
         var OK=200;
 
         if(xhr.readyState == DONE){
-            if(xhr.status == OK){
-                console.log(xhr.responseText);
-            } else{
-                console.log("Error:" + xhr.status);
-            }
+           
         }
 
 
@@ -114,8 +110,12 @@ function validateFields(){
         if(xhr.status>=200 && xhr.status<300){
             
             json=JSON.parse(xhr.response)
-            console.log(json.value);
+            login_status=json[login.value];
 
+            if(login_status=="taken"){
+                is_correct=false;
+
+            }
         }
     }
 
