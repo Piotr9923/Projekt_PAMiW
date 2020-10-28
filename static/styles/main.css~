@@ -82,8 +82,6 @@ form ul li{
 table, th, td {
   border: 1px solid black;
   text-align: center;
-  left: auto;
-  right: auto;
 }
 
 

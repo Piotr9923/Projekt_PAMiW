@@ -1,51 +1,59 @@
 <!doctype>
+
 <html>
+
 	<head>
 		<title>Rejestracja</title>
-		<link rel="stylesheet" href="/static/registration.css"></link>
+		<link rel="stylesheet" href="/static/styles/registration.css"></link>
+		<script src="/static/main.js" defer></script>	
 	</head>
 	
 	<header>
+	  		Piotr Rzewnicki
  	<nav>
     <ul id="menu">
     
       <li id="strona_glowna"><a href="/">Strona główna</a></li>
       <li id="rejestracja"><a href="/sender/sign-up">Rejestracja</a> </li>
-
+		
     </ul>
   	</nav>
 	</header>
-
+	
 	<body>
 
-	<form>
+	<form id="formularz">
 		<ul id="formularz">
-		<li id="imie">
-		Imię: <input type="text" name="imie"/></input>
+			<li>Imię: <input type="text" id="firstname"/></input>	
+			<a href="#" class="tool" tresc="Imię musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img src="/static/images/help.svg"></a></li>
+		<li>
+		Nazwisko:<input type="text"  id="lastname"/></input>
+		<a href="#" class="tool" tresc="Nazwisko musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img src="/static/images/help.svg"></a>
 		</li>
-		<li id="nazwisko">
-		Nazwisko:<input type="text" name="nazwisko"/></input>
+		<li id="plec">
+		Płeć: <input type="radio" id="male" name="sex" value="M">Mężczyzna    	
+				<input type="radio" id="female" name="sex" value="F">Kobieta
 		</li>
-		<li id="email">
-		Adres e-mail: <input type="text" name="email"/></input>
+		<li>
+		Login: <input type="text" id="login" name="login"/></input>
+		<a href="#" class="tool" tresc="Login musi składać się z 3-12 znaków - liter alfabetu łacińskiego!"><img src="/static/images/help.svg"></a>
 		</li>
-		<li id="login">
-		Login: <input type="text" name="login"/></input>
+		<li>
+		Hasło: <input type="password" id="password" name="password"/></input>
+		<a href="#" class="tool" tresc="Hasło musi składać się z liter alfabetu łacińskiego,zawierać wielką literę i mieć długość co najmniej 8 znaków!"><img src="/static/images/help.svg"></a>
 		</li>
-		<li id="haslo">
-		Hasło: <input type="password" name="haslo"/></input>
+		<li>
+		Powtórz hasło: <input type="password" id="password_again"/></input>
 		</li>
-		<li id="powtorz_haslo">
-		Powtórz hasło: <input type="password" name="powtorz_haslo"/></input>
+		<li>
+		Zdjęcie: <input type="file" id="photo" name="photo" accept="image/png, image/jpg"/></input>
 		</li>
-		<li id="zdjecie">
-		Zdjęcie: <input type="file" name="zdjecie" accept="image/png, image/jpg"/></input>
-		</li>
-		<li><input type="submit" value="Zarejestruj"/></input></li>
+		<li><input type="submit" id="button" value="Zarejestruj"/></input></li>
 		</ul>
 	</form>
 	
 
 	</body>
+
 
 </html>

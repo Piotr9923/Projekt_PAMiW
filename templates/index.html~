@@ -32,14 +32,14 @@
 	<section>
  	<table>
  	<tr>
-   <th> Rodzaj przesyłki </th>
-   <th> Cena bruttno [zł] </th>
-   <th> Opis </th>
+   <th>Rodzaj przesyłki</th>
+   <th>Cena bruttno [zł]</th>
+   <th>Opis</th>
   	</tr>
   	<tr>
    <td>Kategoria I</td>
    <td>8,99</td>
-   <td> Maksymalne wymiary: 10x40x60 cm, maksymalna waga: 5 kg, możliwość wysyłania delikatnych rzeczy </td>
+   <td>Maksymalne wymiary: 10x40x60 cm, maksymalna waga: 5 kg, możliwość wysyłania delikatnych rzeczy</td>
   	</tr>
   	<tr>
    <td>Kategoria II</td>

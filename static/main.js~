@@ -1,0 +1,20 @@
+function attach_events(){
+	var firstname = document.getElementById("firstname");
+	firstname.addEventListener("change", function(ev){
+		console.log("Nev value "+ firstname.value);
+
+
+	})
+
+	var button = document.getElementById("button");
+
+	button.addEventListener("click", function(e){
+
+
+		console.info("aaaa");
+	})
+
+
+}
+
+attach_events();

@@ -4,7 +4,7 @@ app = Flask(__name__,static_url_path='/static')
 
 app.debug = False
 
-@app.route('/sender/sign-up')
+@app.route('/sender/sign-up', methods=["GET"])
 def registration():
     return render_template("registration.html")
 
@@ -15,4 +15,3 @@ def index():
 
 
 app.run()
-
