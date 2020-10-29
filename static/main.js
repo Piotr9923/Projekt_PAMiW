@@ -1,18 +1,34 @@
 
 document.getElementById("button").disabled = true;
-
 var login_available = false;
 
 function attach_events() {
 
     var form = document.getElementById("formularz");
     var button = document.getElementById("button");
-    form.addEventListener("change", function (ev) {
+    var available_login_message = document.getElementById("login_message");
+    var login =document.getElementById("login");
+    available_login_message.classList.add("unavailable_login_hidden_message");
+
+    login.addEventListener("keydown",function(ev){
+
+        console.log("test");
+        if(login_available==false && login.value.length>2){
+            console.log("pokaz");
+            available_login_message.classList.remove("unavailable_login_hidden_message");
+        }else{
+            console.log("ukryj");
+            available_login_message.classList.add("unavailable_login_hidden_message");
+        }
+
+
+    })
+
+    form.addEventListener("", function (ev) {
 
         button.disabled = true;
 
-        if (validateFields() == true && login_available == true) button.disabled = false;
-        console.log(login_available);
+        if (validateFields() == true && login_available == true) button.disabled = false;    
 
     })
 
@@ -108,10 +124,7 @@ function validateFields() {
                 json = JSON.parse(xhr.response)
                 login_status = json[login.value];
 
-                console.log("Login: " + login_status);
-
                 if (login_status == "taken") {
-                    console.log("Tes");
 
                     login_available = false;
                 }

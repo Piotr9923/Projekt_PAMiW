@@ -6,8 +6,7 @@
 	</head>
 	
 	<header>
-	
-	<a href="/" ><img src="/static/images/test.jpg"/></a>
+
 	
  	<nav>
     <ul id="menu">
@@ -66,7 +65,7 @@
  	Odbieranie paczek jest bardzo proste. Aby odebrać paczkę z punktu odbioru przesyłek wystarczy posiadać tylko numer telefonu osoby zamawiającej i specjalny kod, który otrzymujesz w wiadomości SMS-owej i e-mailowej.
 	</section>
 	
-	<footer>2020 | <a href="https://github.com/Piotr9923/Projekt_PAMiW">https://github.com/Piotr9923/Projekt_PAMiW</footer>
+	<footer>2020 | <a href="https://github.com/Piotr9923/Projekt_PAMiW">https://github.com/Piotr9923/Projekt_PAMiW</a> | <a href='https://dryicons.com/free-icons/warning'> Icon by Dryicons </a></footer>
 	
 	
 

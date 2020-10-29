@@ -21,13 +21,17 @@
 	</header>
 	
 	<body>
+	
+	<h2> Załóż nowe konto </h2>
 
 	<form id="formularz" method="POST" action="https://infinite-hamlet-29399.herokuapp.com/sender/register" enctype="multipart/form-data" >
 		<ul id="formularz">
 			<li>Imię: <input type="text" id="firstname" name="firstname"/></input>	
-			<a href="#" class="tool" tresc="Imię musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img src="/static/images/help.svg"></a></li>
+
+			<a href="#" class="tool" tresc="Imię musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img src="/static/images/help.svg"></a>
+			</li>
 		<li>
-		Nazwisko:<input type="text"  id="lastname" name="lastname"/></input>
+		Nazwisko: <input type="text"  id="lastname" name="lastname"/></input>
 		<a href="#" class="tool" tresc="Nazwisko musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img src="/static/images/help.svg"></a>
 		</li>
 		<li id="plec">
@@ -38,6 +42,7 @@
 		Login: <input type="text" id="login" name="login"/></input>
 		<a href="#" class="tool" tresc="Login musi składać się z 3-12 małych liter alfabetu łacińskiego!"><img src="/static/images/help.svg"></a>
 		</li>
+		<li class="unavailable_login_text" id="login_message">Ten login jest zajęty! Wpisz inną nazwę użytkownika!</li>
 		<li>
 		Hasło: <input type="password" id="password" name="password"/></input>
 		<a href="#" class="tool" tresc="Hasło musi składać się z liter alfabetu łacińskiego,zawierać wielką literę i mieć długość co najmniej 8 znaków!"><img src="/static/images/help.svg"></a>
