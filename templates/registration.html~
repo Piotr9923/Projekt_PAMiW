@@ -36,7 +36,7 @@
 		</li>
 		<li>
 		Login: <input type="text" id="login" name="login"/></input>
-		<a href="#" class="tool" tresc="Login musi składać się z 3-12 znaków - liter alfabetu łacińskiego!"><img src="/static/images/help.svg"></a>
+		<a href="#" class="tool" tresc="Login musi składać się z 3-12 małych liter alfabetu łacińskiego!"><img src="/static/images/help.svg"></a>
 		</li>
 		<li>
 		Hasło: <input type="password" id="password" name="password"/></input>
@@ -46,7 +46,7 @@
 		Powtórz hasło: <input type="password" id="password_again"/></input>
 		</li>
 		<li>
-		Zdjęcie: <input type="file" id="photo" name="photo" accept="image/png, image/jpg"/></input>
+		Zdjęcie: <input type="file" id="photo" name="photo" accept=".png, .jpg"/></input>
 		</li>
 		<li><input type="submit" id="button" value="Zarejestruj"/></input></li>
 		</ul>
