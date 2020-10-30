@@ -104,7 +104,8 @@ function attach_events() {
                             document.getElementById("login_message").classList.add("unavailable_login_hidden_message");
                             update_button();
                         }
-                    }                  
+                    } 
+            
                 }
 
             }
