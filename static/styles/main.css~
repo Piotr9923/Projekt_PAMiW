@@ -79,7 +79,7 @@ form ul li{
   border-collapse: collapse;
   margin-left: auto;
   margin-right: auto;
-  background-color: whitesmoke;
+  background-color: wheat;
 }
 
 table, th, td {
@@ -89,7 +89,7 @@ table, th, td {
 
 
 footer{
-	position: absolute;
+	position: inherit;
 	bottom: 0;
 	text-align: center;
 	width: 100%;

@@ -10,7 +10,7 @@ body{
 	max-width: 100%;
 	margin-left: auto;
 	margin-right: auto;
-	padding-bottom: 25px;
+	padding-bottom: -25px;
 }
 
 nav ul{
@@ -26,9 +26,6 @@ ul #menu {
 	list-style: none;
 }
 
-li #password{
-	top: 10px;
-}
 
 nav a{
 	width: 150px;
@@ -62,14 +59,12 @@ form{
 form ul li{
 	list-style: none;
 	float: inherit;
-	margin-top: 15px;
+	margin-top: 1px;
 }
 
-form ul li #password{
-	margin-top: 0px;
-
+.input_field{
+	margin-bottom: 15px;
 }
-
 
 a.tool {
     position: relative;
@@ -102,7 +97,7 @@ a.tool::before {
  
 
 footer{
-	position: absolute;
+	position: inherit;
 	bottom: 0;
 	text-align: center;
 	width: 100%;

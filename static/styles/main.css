@@ -89,7 +89,7 @@ table, th, td {
 
 
 footer{
-	position: absolute;
+	position: inherit;
 	bottom: 0;
 	text-align: center;
 	width: 100%;

@@ -59,7 +59,11 @@ form{
 form ul li{
 	list-style: none;
 	float: inherit;
-	margin-top: 15px;
+	margin-top: 1px;
+}
+
+.input_field{
+	margin-bottom: 15px;
 }
 
 a.tool {
@@ -93,7 +97,7 @@ a.tool::before {
  
 
 footer{
-	position: absolute;
+	position: inherit;
 	bottom: 0;
 	text-align: center;
 	width: 100%;
