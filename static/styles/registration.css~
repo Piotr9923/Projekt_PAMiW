@@ -120,7 +120,7 @@ footer{
 	color:red;
 }
 
-.unavailable_login_hidden{
+.unavailable_login_hidden_message{
 	visibility: hidden;
 }
 

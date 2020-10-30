@@ -24,7 +24,7 @@ function attach_events() {
 
     })
 
-    form.addEventListener("", function (ev) {
+    form.addEventListener("touchend", function (ev) {
 
         button.disabled = true;
 

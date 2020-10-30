@@ -5,7 +5,7 @@
 	<head>
 		<title>Rejestracja</title>
 		<link rel="stylesheet" href="/static/styles/registration.css"></link>
-		<script src="/static/main.js" defer></script>	
+		<script src="/static/registration.js" defer></script>	
 	</head>
 	
 	<header>
@@ -34,7 +34,7 @@
 		Nazwisko: <input type="text"  id="lastname" name="lastname"/></input>
 		<a href="#" class="tool" tresc="Nazwisko musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img src="/static/images/help.svg"></a>
 		</li>
-		<li id="plec">
+		<li id="sex">
 		Płeć: <input type="radio" id="male" name="sex" value="M">Mężczyzna    	
 				<input type="radio" id="female" name="sex" value="F">Kobieta
 		</li>
