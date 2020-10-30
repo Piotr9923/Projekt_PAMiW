@@ -88,7 +88,7 @@ function attach_events() {
                 var DONE = 4;
 
                 if (xhr.readyState == DONE) {
-                    if (xhr.status >= 200 && xhr.status < 300) {
+                    if (xhr.status == 200) {
 
                         json = JSON.parse(xhr.response)
                         login_status = json[login.value];
@@ -104,7 +104,7 @@ function attach_events() {
                             document.getElementById("login_message").classList.add("unavailable_login_hidden_message");
                             update_button();
                         }
-                    }
+                    }                  
                 }
 
             }

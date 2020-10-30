@@ -65,7 +65,7 @@
             <li>
                 Zdjęcie: <input type="file" id="photo" name="photo" accept=".png, .jpg" /></input>
             </li>
-            <li><input type="submit" id="button" value="Zarejestruj" /></input></li>
+            <li><input type="submit" id="button" value="Zarejestruj się" /></input></li>
         </ul>
     </form>
 

@@ -24,10 +24,12 @@ function attach_events() {
 
     firstname.addEventListener("keyup", function (ev) {
 
+        console.log("aaa");
+
         if (firstname.value.match(/[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśź]+$/) && firstname.value[0].match(/[A-ZĄĆĘŁŃÓŚŹŻ]+$/) && /[a-ząćęłńóśź]/.test(firstname.value)) {
             firstname.classList.remove("incorrect_field");
             firstname_correct = true;
-            
+
         }
         else {
             is_correct = false;
@@ -53,7 +55,7 @@ function attach_events() {
     });
 
 
-    sex.addEventListener("click",function(){
+    sex.addEventListener("click", function () {
 
         if (male.checked || female.checked) {
             sex_correct = true;
@@ -63,12 +65,12 @@ function attach_events() {
         update_button();
 
     });
-    
+
 
 
     login.addEventListener("keyup", function (ev) {
 
-        if (login.value.toLowerCase()==login.value && login.value.length > 2 && login.value.length < 13) {
+        if (login.value.toLowerCase() == login.value && login.value.length > 2 && login.value.length < 13) {
 
             login.classList.remove("incorrect_field");
             login_correct = true;
@@ -110,13 +112,12 @@ function attach_events() {
             }
 
             xhr.send(null);
-
         }
 
     });
 
 
-    password.addEventListener("keyup", function(ev){
+    password.addEventListener("keyup", function (ev) {
 
         if (password.value.match(/[A-Za-z]+$/) && /[A-Z]/.test(password.value) && password.value.length > 7) {
             password.classList.remove("incorrect_field");
@@ -129,7 +130,7 @@ function attach_events() {
         update_button();
     });
 
-    password_again.addEventListener("keyup", function(ev){
+    password_again.addEventListener("keyup", function (ev) {
 
         if (password.value == password_again.value) {
             password_again.classList.remove("incorrect_field");
@@ -140,15 +141,15 @@ function attach_events() {
             password_again_correct = false;
         }
         update_button();
-        
+
     });
 
-    photo.addEventListener("change", function(){
+    photo.addEventListener("change", function () {
 
         if (photo.files[0] == undefined) {
             photo_correct = false;
         }
-        else{
+        else {
             photo_correct = true;
         }
         update_button();
@@ -157,10 +158,10 @@ function attach_events() {
 
 }
 
-function update_button(){
+function update_button() {
 
     document.getElementById("button").disabled = !(firstname_correct && lastname_correct && sex_correct && login_correct &&
-        login_available && password_correct && password_again_correct && photo_correct );
+        login_available && password_correct && password_again_correct && photo_correct);
 
 }
 
