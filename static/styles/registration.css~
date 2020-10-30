@@ -95,7 +95,7 @@ a.tool::before {
     border-radius: 3px;
 } 
 
-img #logo{
+.logo_image{
 	width: 100%;
 	height: 150px;
 }
@@ -109,6 +109,11 @@ footer{
 	width: 100%;
 	height: 25px;
 	font-size: 15px;
+}
+
+form input[type="radio]{
+	color: black;
+	background: green;
 }
 
 

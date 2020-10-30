@@ -9,7 +9,7 @@
 </head>
 
 <header>
-    <img src="/static/images/logo.png" alt="logo" name="logo">
+    <img src="/static/images/logo.png" alt="logo" class="logo_image">
     Piotr Rzewnicki
     <nav>
         <ul id="menu">
@@ -41,8 +41,8 @@
                     tresc="Nazwisko musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img
                         src="/static/images/help.svg"></a>
             </li>
-            <li id="sex"><b> Płeć: </b><input type="radio" class="input_field" id="male" name="sex" value="M">Mężczyzna
-                <input type="radio" class="input_field" id="female" name="sex" value="F">Kobieta
+            <li id="sex"><b> Płeć: </b><input type="radio" class="sex_label" id="male" name="sex" value="M">Mężczyzna
+                <input type="radio" class="sex_label" id="female" name="sex" value="F">Kobieta
             </li>
             <li><b>Login: </b></li><li><input type="text" class="input_field" id="login" name="login" /></input>
                 <a href="#" class="tool" tresc="Login musi składać się z 3-12 małych liter alfabetu łacińskiego!"><img
