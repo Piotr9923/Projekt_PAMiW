@@ -41,8 +41,8 @@
                     tresc="Nazwisko musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img
                         src="/static/images/help.svg"></a>
             </li>
-            <li id="sex"><b> Płeć: </b><input type="radio" class="sex_label" id="male" name="sex" value="M">Mężczyzna
-                <input type="radio" class="sex_label" id="female" name="sex" value="F">Kobieta
+            <li id="sex"><b> Płeć: </b><input type="radio" class="input_field" id="male" name="sex" value="M">Mężczyzna
+                <input type="radio" class="input_field" id="female" name="sex" value="F">Kobieta
             </li>
             <li><b>Login: </b></li><li><input type="text" class="input_field" id="login" name="login" /></input>
                 <a href="#" class="tool" tresc="Login musi składać się z 3-12 małych liter alfabetu łacińskiego!"><img
@@ -58,7 +58,7 @@
             <li> <b>Powtórz hasło:</b></li><li> <input type="password" class="input_field" id="password_again" /></input>
             </li>
             <li>
-                Zdjęcie:</li><li> <input type="file" class="input_field" id="photo" name="photo" accept=".png, .jpg" /></input>
+                <b>Zdjęcie:</b></li><li> <input type="file" class="input_field" id="photo" name="photo" accept=".png, .jpg" /></input>
             </li>
             <li><input type="submit" id="button" value="Zarejestruj się" /></input></li>
         </ul>

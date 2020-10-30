@@ -160,8 +160,14 @@ function attach_events() {
 
 function update_button(){
 
-    document.getElementById("button").disabled = !(firstname_correct && lastname_correct && sex_correct && login_correct &&
-        login_available && password_correct && password_again_correct && photo_correct );
+    if(firstname_correct && lastname_correct && sex_correct && login_correct &&
+        login_available && password_correct && password_again_correct && photo_correct ){
+            document.getElementById("button").disabled = false;
+            document.getElementById("button").classList.remove("disabled_button");
+        } else{
+            document.getElementById("button").disabled = true;
+            document.getElementById("button").classList.add("disabled_button");
+        }
 
 }
 
