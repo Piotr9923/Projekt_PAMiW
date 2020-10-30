@@ -52,7 +52,7 @@
             </li>
             <li><b> Hasło:</b></li><li> <input type="password" class="input_field" id="password" name="password" /></input>
                 <a href="#" class="tool"
-                    tresc="Hasło musi składać się z liter alfabetu łacińskiego,zawierać wielką literę i mieć długość co najmniej 8 znaków!"><img
+                    tresc="Hasło musi składać się z min. 8 liter alfabetu łacińskiego i zawierać wielką literę!"><img
                         src="/static/images/help.svg"></a>
             </li>
             <li> <b>Powtórz hasło:</b></li><li> <input type="password" class="input_field" id="password_again" /></input>
