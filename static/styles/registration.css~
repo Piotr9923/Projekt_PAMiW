@@ -123,5 +123,3 @@ footer{
 .unavailable_login_hidden_message{
 	visibility: hidden;
 }
-
-
