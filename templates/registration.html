@@ -5,7 +5,7 @@
 	<head>
 		<title>Rejestracja</title>
 		<link rel="stylesheet" href="/static/styles/registration.css"></link>
-		<script src="/static/registration.js" defer></script>	
+		<script src="/static/scripts/registration.js" defer></script>	
 	</head>
 	
 	<header>
@@ -22,10 +22,10 @@
 	
 	<body>
 	
-	<h2> Załóż nowe konto </h2>
 
 	<form id="formularz" method="POST" action="https://infinite-hamlet-29399.herokuapp.com/sender/register" enctype="multipart/form-data" >
-		<ul id="formularz">
+		<ul>
+			<li><h2> Załóż nowe konto </h2></li>
 			<li>Imię: <input type="text" id="firstname" name="firstname"/></input>	
 
 			<a href="#" class="tool" tresc="Imię musi zaczynać się z wielkiej litery i składać się co najmniej z 1 małej litery!"><img src="/static/images/help.svg"></a>
