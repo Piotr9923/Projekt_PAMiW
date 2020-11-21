@@ -47,6 +47,7 @@ nav ul{
 	background: green;
 	overflow: auto;
 	list-style: none;
+	max-width: 100%;
 }
 
 ul #menu {
