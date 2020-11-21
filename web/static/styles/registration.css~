@@ -66,7 +66,6 @@ input[type=submit]{
   margin: 4px 2px;
   cursor: pointer;
   font-size: 16px;
-  margin-right: 1px;
 }
 
 .disabled_button[type=submit]{

@@ -6,15 +6,15 @@ from os import getenv
 from bcrypt import hashpw, gensalt, checkpw
 from redis import Redis
 from datetime import datetime
+import sys
 
-db=Redis(host='redis',port=6379,db=0)
+db=Redis(host='redis', port=6379, db=0)
 
 load_dotenv()
 
 SESSION_TYPE="redis"
 SESSION_REDIS=db
 
-# app = Flask(__name__,static_url_path='/static')
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.secret_key = getenv("SECRET_KEY")
@@ -28,8 +28,6 @@ def is_user(login):
 
 
 def save_user(firstname, lastname, login, email, password, adress):
-
-    print(f"ZAPISUJĘ: {firstname}, {lastname},{login},{email},{password},{adress}")
 
     salt = gensalt(5)
     password = password.encode()
@@ -54,7 +52,6 @@ def verify_user(login, password):
     password = password.encode()
     hashed = db.hget(f"user:{login}","password")
     if not hashed:
-        print(f"ERROR: No password for {login}")
         return False
     return checkpw(password,hashed)
 
@@ -63,8 +60,16 @@ def error(msg,status=400):
     response = make_response({"status":"error","message":msg},status)
 
 
+def test():
+    for key in db.scan_iter("user:*"):
+        print(db.hget(key,"adress"),flush=True)
+
 @app.route('/')
 def index():
+
+    if session.get('login') is not None:
+        return render_template('logged_index.html')
+
     return render_template("index.html")
 
 
@@ -101,7 +106,7 @@ def registration():
 
     if email and login and password and firstname and lastname and adress:
         if is_user(login):
-            flash(f"User {login} istnieje")
+            flash(f"Użytkownik {login} istnieje")
             return redirect(url_for('registration_form'))
     else:
         return redirect(url_for('registration_form'))
@@ -126,6 +131,8 @@ def login():
     login = request.form.get("login")
     password = request.form.get("password")
 
+    test()
+
     if not login or not password:
         flash("Brak nazwy użytkownika lub hasła")
         return redirect(url_for('login_form'))
@@ -134,10 +141,21 @@ def login():
         flash("Błędna nazwa użytkownika i/lub hasła")
         return redirect(url_for('login_form'))
 
-    flash(f"Welcome {login}!")
     session["login"] = login
     session["logged-at"] = datetime.now()
-    return redirect(url_for('index'))
+
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/sender/dashboard')
+def dashboard():
+
+    if session.get('login') is None:
+        return render_template("index.html")
+
+    print(session,flush=True)
+
+    return render_template("dashboard.html")
 
 
 @app.route('/sender/logout')

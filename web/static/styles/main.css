@@ -43,11 +43,11 @@ p {
 }
 
 nav ul{
-	width: 100%;
+	width: 50%;
 	background: green;
 	overflow: auto;
 	list-style: none;
-	max-width: 100%;
+	max-width: 50%;
 }
 
 ul #menu {
