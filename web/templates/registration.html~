@@ -10,7 +10,6 @@
 
 <header>
     <a href="/"><img src="/static/images/logo.png" alt="logo" class="logo_image"></a>
-    Piotr Rzewnicki
     <nav>
         <ul id="menu">
 

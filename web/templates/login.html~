@@ -24,6 +24,16 @@
 <body>
 
 
+{% with messages = get_flashed_messages() %}
+	{% if messages %}
+		<ul class=flashes>
+ 		{% for message in messages %}
+ 			<li>{{ message }}</li>
+ 		{% endfor %}
+ 		</ul>
+ 	{% endif %}
+{% endwith %}
+	
     <form id="formularz" method="POST" action="/sender/login"
         enctype="multipart/form-data">
         <ul>
@@ -31,7 +41,7 @@
                 <h1> Zaloguj się </h1>
             </li>
             <li><b>Login: </b></li><li><input type="text" class="input_field" id="login" name="login" /></input>
-
+				</li>
             <li><b> Hasło:</b></li><li> <input type="password" class="input_field" id="password" name="password" /></input>
             </li>
            

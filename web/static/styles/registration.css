@@ -128,6 +128,14 @@ footer{
 	font-size: 15px;
 }
 
+.flashes{
+	text-align: center;
+	background-color: red;
+	list-style-type: none;
+	width: 420px;
+	margin: auto;
+}
+
 
 .incorrect_field{
 	color: red;

@@ -88,6 +88,52 @@ table, th, td {
   text-align: center;
 }
 
+#labels{
+	width: 70%;
+	margin: auto;
+	list-style-type: none;
+}
+
+tr.label{
+	background-color: yellowgreen;
+	width: 100%;
+	border-style: hidden;
+}
+
+tr.empty{
+	background-color: blanchedalmond;
+	width: 100%;
+	height: 20px;
+	border-style: hidden;
+	
+}
+
+
+th.id{
+	width: 70%;
+	border-color: yellowgreen;
+}
+
+th.more{
+	width: 20%;
+	border-color: yellowgreen;
+}
+
+.flashes{
+	text-align: center;
+	background-color: red;
+	list-style-type: none;
+	width: 420px;
+	margin: auto;
+}
+
+.center_text{
+text-align: center;
+}
+
+.list_none{
+list-style-type: none;
+}
 
 footer{
 	margin-top: 50px;

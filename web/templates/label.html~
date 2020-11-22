@@ -23,23 +23,15 @@
 <body>
 
    
-   {% if haslabels %}
-   <h1>Twoje etykiety paczek:</h1>
-   <br/>
-		 <table>  	
-   	{% for label in labels %}
-   	
-   	<tr class="label">
-			<th class="id"><b>Id etykiety: {{label}}</b></th>
-			<th class="more"><a href="/labels/{{label}}">Wyświetl szczegóły</a></th>
-			<th class="delete"><a href="/label/delete/{{label}}">Usuń</a></th>	
-		</tr>
-		<tr class="empty"></tr>
-   	{% endfor %}
-   	 </table>
-   {% else %}
-   	<h2 class="center_text">Nie masz etykiet skojarzonych z Twoim kontem</h2>
-  	{% endif %}
+   <h1 class="center_text">Szczegóły etykiety:</h1>
+   
+   <ul>
+		<li><h2>ID etykiety: {{label_id}}<h2></li>
+		<li><h2>Nazwa adresata: {{name}}<h2></li>
+		<li><h2>ID skrytki: {{delivery}}<h2></li>
+		<li><h2>Rozmiar przesyłki: {{size}}<h2></li>  
+
+   </ul>
    
 
     <footer>2020 | <a href="https://github.com/Piotr9923/Projekt_PAMiW">https://github.com/Piotr9923/Projekt_PAMiW</a> |

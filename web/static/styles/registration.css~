@@ -14,7 +14,7 @@ body{
 }
 
 nav ul{
-	width: 97%;
+	width: 50%;
 	background: green;
 	overflow: auto;
 	list-style: none;
@@ -126,6 +126,14 @@ footer{
 	width: 100%;
 	height: 25px;
 	font-size: 15px;
+}
+
+.flashes{
+	text-align: center;
+	background-color: red;
+	list-style-type: none;
+	width: 420px;
+	margin: auto;
 }
 
 
