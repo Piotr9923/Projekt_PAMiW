@@ -23,6 +23,7 @@ ses = Session(app)
 
 # app.debug = False
 
+
 def is_user(login):
     return db.hexists(f"user:{login}","password")
 
@@ -51,6 +52,7 @@ def save_label(id, name, delivery_id, size):
     db.hset(f"label:{id}", "size", size)
     db.hset(f"label:{id}", "sender", session.get('login'))
     return True
+
 
 def redirect(url, status=301):
     response = make_response('',status)
@@ -107,22 +109,22 @@ def registration():
         flash("Brak hasła")
     if password != password2:
         flash(f"Hasła nie są takie same {password} _ {password2}")
-        return redirect(url_for('registration_form'),400)
+        return redirect(url_for('registration_form'))
 
     if email and login and password and firstname and lastname and adress:
         if is_user(login):
             flash(f"Użytkownik {login} istnieje")
-            return redirect(url_for('registration_form'),400)
+            return redirect(url_for('registration_form'))
     else:
-        return redirect(url_for('registration_form'),400)
+        return redirect(url_for('registration_form'))
 
     success = save_user(firstname,lastname,login,email,password,adress)
 
     if not success:
         flash("Błąd rejestracji")
-        return redirect(url_for('registration_form'),500)
+        return redirect(url_for('registration_form'))
 
-    return redirect(url_for('login_form'),201)
+    return redirect(url_for('login_form'))
 
 
 @app.route('/sender/login', methods=["GET"])
@@ -131,7 +133,8 @@ def login_form():
     if session.get('login') is None:
         return render_template("login.html")
 
-    return redirect(url_for('index'),409)
+    return redirect(url_for('index'))
+
 
 @app.route('/sender/login', methods=["POST"])
 def login():
@@ -140,17 +143,17 @@ def login():
 
     if not login or not password:
         flash("Brak nazwy użytkownika lub hasła")
-        return redirect(url_for('login_form'),400)
+        return redirect(url_for('login_form'))
 
     if not verify_user(login,password):
         flash("Błędna nazwa użytkownika i/lub hasła")
-        return redirect(url_for('login_form'),400)
+        return redirect(url_for('login_form'))
 
     session["login"] = login
     session["id"] = uuid4()
     session["logged-at"] = datetime.now()
 
-    return redirect(url_for('dashboard'),200)
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/sender/dashboard')
@@ -158,7 +161,7 @@ def dashboard():
 
     if session.get('login') is None:
         flash("Najpierw musisz się zalogować")
-        return redirect(url_for('login_form'),401)
+        return redirect(url_for('login_form'))
 
     labels={}
 
@@ -180,7 +183,7 @@ def add_label_form():
 
     if session.get('login') is None:
         flash("Najpierw musisz się zalogować")
-        return redirect(url_for('login_form'),401)
+        return redirect(url_for('login_form'))
 
     return render_template("add_label.html")
 
@@ -194,24 +197,24 @@ def add_label():
 
     if not name:
         flash("Brak danych odbiorcy")
-        return redirect(url_for('add_label_form'),400)
+        return redirect(url_for('add_label_form'))
 
     if not delivery_id:
         flash("Brak id punktu odbioru")
-        return redirect(url_for('add_label_form'),400)
+        return redirect(url_for('add_label_form'))
 
     if not size:
         flash("Brak wybranego rozmiaru")
-        return redirect(url_for('add_label_form'),400)
+        return redirect(url_for('add_label_form'))
 
     if name and delivery_id and size:
         success = save_label(label_id,name,delivery_id,size)
 
     if not success:
         flash("Błąd tworzenia paczki")
-        return redirect(url_for('add_label_form'),500)
+        return redirect(url_for('add_label_form'))
 
-    return redirect(url_for('dashboard'),201)
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/labels/<lid>', methods=["GET"])
@@ -232,7 +235,7 @@ def delete_label(lid):
 
     db.delete(f"label:{lid}")
 
-    return redirect(url_for('dashboard'),200)
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/sender/logout')
@@ -241,6 +244,7 @@ def sender_logout():
     for key in db.scan_iter("session:*"):
         db.delete(key)
 
+    print(flask.session["_id"])
     session.clear()
 
     return render_template("logout.html")
