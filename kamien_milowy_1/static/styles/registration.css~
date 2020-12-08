@@ -14,7 +14,7 @@ body{
 }
 
 nav ul{
-	width: 50%;
+	width: 97%;
 	background: green;
 	overflow: auto;
 	list-style: none;
@@ -66,6 +66,7 @@ input[type=submit]{
   margin: 4px 2px;
   cursor: pointer;
   font-size: 16px;
+  margin-right: 1px;
 }
 
 .disabled_button[type=submit]{
@@ -126,14 +127,6 @@ footer{
 	width: 100%;
 	height: 25px;
 	font-size: 15px;
-}
-
-.flashes{
-	text-align: center;
-	background-color: red;
-	list-style-type: none;
-	width: 420px;
-	margin: auto;
 }
 
 
