@@ -38,16 +38,22 @@ app.debug = False
 
 @app.before_request
 def before():
+    print("BEFORE")
+    print(request.headers)
     token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    print("PO TOKEN")
+    if token is not None:
+        try:
+            g.authorization = decode(token, str(JWT_SECRET), algorithms=["HS256"])
 
-    try:
-        g.authorization = decode(token, str(JWT_SECRET), algorithms=["HS256"])
-
-        print("Authorized " + str(g.authorization))
-    except Exception as e:
-        print("Unauthorized " + str(e))
+            print("Authorized " + str(g.authorization))
+        except Exception as e:
+            print("Unauthorized " + str(e))
+            g.authorization = {}
+    else:
         g.authorization = {}
 
+    print("KONCZE BEFORE")
 
 def generate_delete_token(label, login):
     payload = {
@@ -113,7 +119,7 @@ def verify_user(login, password):
 @app.route('/')
 def index():
     links = []
-    if g.authorization is None:
+    if g.authorization.get("usr") is None:
         links.append(Link("login", "/sender/login"))
         links.append(Link("register", "/sender/register"))
         document = Document(data={}, links=links)
@@ -146,7 +152,7 @@ def registration():
 
     if not is_database_available():
         errors.append("Błąd połączenia z bazą danych")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
     if not firstname:
@@ -163,22 +169,23 @@ def registration():
         errors.append("Brak hasła")
     if password != password2:
         errors.append("Hasła nie są takie same")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
     if email and login and password and firstname and lastname and adress:
         if is_user(login):
             errors.append("Taka nazwa użytkownika istnieje")
-            document = Document(data=errors, links=links)
+            document = Document(data={"errors": errors}, links=links)
             return document.to_json(), 400
     else:
-        document = Document(data=data, links=links)
+        print("ZWRACAM ERRORS: " + str(errors))
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
     success = save_user(firstname, lastname, login, email, password, adress)
     if not success:
         errors.append("Wystąpił błąd podczas rejestracji. Spróbuj później")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
     document = Document(links=links)
@@ -206,12 +213,12 @@ def login():
 
     if not login or not password:
         errors.append("Brak loginu lub hasła")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
     if not verify_user(login, password):
         errors.append("Błędny login lub hasło")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
     links = []
@@ -219,7 +226,6 @@ def login():
     links.append(Link("dashboard", "/sender/dashboard"))
     links.append(Link("label:add", "/label/add"))
     links.append(Link("logout", "/sender/logout"))
-    document = Document(data=data, links=links)
     payload = {
         "exp": datetime.utcnow() + timedelta(seconds=JWT_TIME),
         "usr": login
@@ -255,7 +261,7 @@ def dashboard():
             }
 
     for label in labels:
-        links.append(Link("label:"+label['id'], "/labels/"+label['id']))
+        links.append(Link("label:"+label, "/labels/"+label))
 
     links.append(Link("label:add", "/label/add"))
     links.append(Link("label:{la}", "/sender/logout"))
