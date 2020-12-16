@@ -29,7 +29,7 @@ SESSION_TYPE = "redis"
 SESSION_REDIS = db
 SESSION_COOKIE_HTTPONLY = True
 JWT_SECRET = getenv("JWT_SECRET")
-JWT_TIME = 300
+JWT_TIME = 30000
 app.config.from_object(__name__)
 app.secret_key = getenv("SECRET_KEY")
 
@@ -128,8 +128,10 @@ def index():
 @app.route('/sender/register', methods=['POST'])
 def registration():
     form_values = request.json
+    errors=[]
     if form_values is None:
         return {"error": "Brak JSON"}
+
     firstname = form_values.get("firstname")
     lastname = form_values.get("lastname")
     adress = form_values.get("adress")
@@ -139,36 +141,35 @@ def registration():
     password2 = form_values.get("password2")
 
     links = []
-    data = {}
     links.append(Link("login", "/sender/login"))
     links.append(Link("register", "/sender/register"))
 
     if not is_database_available():
-        data["dbError"] = "Błąd połączenia z bazą danych"
-        document = Document(data=data, links=links)
+        errors.append("Błąd połączenia z bazą danych")
+        document = Document(data=errors, links=links)
         return document.to_json(), 400
 
     if not firstname:
-        data["firstnameError"] = "Brak imienia"
+        errors.append("Brak imienia")
     if not lastname:
-        data["lastnameError"] = "Brak nazwiska"
+        errors.append("Brak nazwiska")
     if not adress:
-        data["adressError"] = "Brak adresu"
+        errors.append("Brak adresu")
     if not email:
-        data["mailError"] = "Brak maila"
+        errors.append("Brak maila")
     if not login:
-        data["loginError"] = "Brak loginu"
+        errors.append("Brak loginu")
     if not password:
-        data["passwordError"] = "Brak hasła"
+        errors.append("Brak hasła")
     if password != password2:
-        data["passwordError"] = "Hasła nie są takie same"
-        document = Document(data=data, links=links)
+        errors.append("Hasła nie są takie same")
+        document = Document(data=errors, links=links)
         return document.to_json(), 400
 
     if email and login and password and firstname and lastname and adress:
         if is_user(login):
-            data["loginError"] = "Taka nazwa użytkownika istnieje"
-            document = Document(data=data, links=links)
+            errors.append("Taka nazwa użytkownika istnieje")
+            document = Document(data=errors, links=links)
             return document.to_json(), 400
     else:
         document = Document(data=data, links=links)
@@ -176,9 +177,11 @@ def registration():
 
     success = save_user(firstname, lastname, login, email, password, adress)
     if not success:
-        data["registrationError"] = "Wystąpił błąd podczas rejestracji. Spróbuj później"
+        errors.append("Wystąpił błąd podczas rejestracji. Spróbuj później")
+        document = Document(data=errors, links=links)
+        return document.to_json(), 400
 
-    document = Document(data=data, links=links)
+    document = Document(links=links)
     return document.to_json(), 200
 
 
@@ -192,26 +195,27 @@ def login():
     password = form_values.get("password")
 
     links = []
-    data = {}
+    errors = []
     links.append(Link("login", "/sender/login"))
     links.append(Link("register", "/sender/register"))
 
     if not is_database_available():
-        data["dbError"] = "Błąd połączenia z bazą danych"
-        document = Document(data=data, links=links)
+        errors.append("Błąd połączenia z bazą danych")
+        document = Document(data=errors, links=links)
         return document.to_json(), 400
 
     if not login or not password:
-        data["formError"] = "Brak loginu lub hasła"
-        document = Document(data=data, links=links)
+        errors.append("Brak loginu lub hasła")
+        document = Document(data=errors, links=links)
         return document.to_json(), 400
 
     if not verify_user(login, password):
-        data["loginError"] = "Błędny login lub hasło"
-        document = Document(data=data, links=links)
+        errors.append("Błędny login lub hasło")
+        document = Document(data=errors, links=links)
         return document.to_json(), 400
 
     links = []
+    data = {}
     links.append(Link("dashboard", "/sender/dashboard"))
     links.append(Link("label:add", "/label/add"))
     links.append(Link("logout", "/sender/logout"))
@@ -232,8 +236,14 @@ def dashboard():
     data = {}
     links = []
     labels = {}
+    errors = []
 
     login = g.authorization.get("usr")
+
+    if login is None:
+        errors.append("Brak autoryzacji")
+        document = Document(data=errors, links=links)
+        return document.to_json(), 400
 
     for key in db.scan_iter("label:*"):
         if db.hget(key, "sender").decode() == login:
@@ -245,7 +255,7 @@ def dashboard():
             }
 
     for label in labels:
-        links.append(Link(f"label:{label['id']}", f"/labels/{label['id']}"))
+        links.append(Link("label:"+label['id'], "/labels/"+label['id']))
 
     links.append(Link("label:add", "/label/add"))
     links.append(Link("label:{la}", "/sender/logout"))
@@ -259,10 +269,20 @@ def dashboard():
 @app.route('/label/add', methods=['POST'])
 def add_label():
     form_values = request.json
-    if form_values is None:
-        return {"error": "Brak JSON"}
 
-    data = {}
+    errors = []
+
+    if g.authorization is None:
+        errors.append("Brak autoryzacji")
+        document = Document(data=errors, links=links)
+        return document.to_json(), 400
+
+
+    if form_values is None:
+        errors.append("Brak pliku JSON")
+        document = Document(data=errors, links=links)
+        return document.to_json(), 400
+
     links = []
     links.append(Link("dashboard", "/sender/dashboard"))
     links.append(Link("label:add", "/label/add"))
@@ -272,11 +292,10 @@ def add_label():
     delivery_id = form_values.get("delivery_id")
     size = form_values.get("size")
     label_id = uuid4()
-    errors = []
 
     if not is_database_available():
-        data["dbError"] = "Błąd połączenia z bazą danych"
-        document = Document(data=data, links=links)
+        errors.append("Błąd połączenia z bazą danych")
+        document = Document(data=errors, links=links)
         return document.to_json(), 400
 
     if not name:
