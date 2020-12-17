@@ -38,10 +38,7 @@ app.debug = False
 
 @app.before_request
 def before():
-    print("BEFORE")
-    print(request.headers)
     token = request.headers.get("Authorization", "").replace("Bearer ", "")
-    print("PO TOKEN")
     if token is not None:
         try:
             g.authorization = decode(token, str(JWT_SECRET), algorithms=["HS256"])
@@ -52,18 +49,6 @@ def before():
             g.authorization = {}
     else:
         g.authorization = {}
-
-    print("KONCZE BEFORE")
-
-def generate_delete_token(label, login):
-    payload = {
-        "iss": "label auth server",
-        "sub": label,
-        "usr": login,
-        "aud": "label delete service"
-    }
-    token = encode(payload, JWT_SECRET, algorithm='HS256')
-    return token
 
 
 def is_database_available():
@@ -100,12 +85,6 @@ def save_label(id, name, delivery_id, size):
     db.hset(f"label:{id}", "size", size)
     db.hset(f"label:{id}", "sender", g.authorization.get("usr"))
     return True
-
-
-def redirect(url, status=301):
-    response = make_response('', status)
-    response.headers['Location'] = url
-    return response
 
 
 def verify_user(login, password):
@@ -208,7 +187,7 @@ def login():
 
     if not is_database_available():
         errors.append("Błąd połączenia z bazą danych")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
     if not login or not password:
@@ -241,27 +220,29 @@ def login():
 def dashboard():
     data = {}
     links = []
-    labels = {}
+    labels = []
     errors = []
 
     login = g.authorization.get("usr")
 
     if login is None:
         errors.append("Brak autoryzacji")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
     for key in db.scan_iter("label:*"):
         if db.hget(key, "sender").decode() == login:
-            labels[db.hget(key, "id").decode()] = {
+            label={}
+            label = {
                 "id": db.hget(key, "id").decode(),
                 "name": db.hget(key, "name").decode(),
                 "delivery_id": db.hget(key, "delivery_id").decode(),
                 "size": db.hget(key, "size").decode()
             }
+            labels.append(label)
 
     for label in labels:
-        links.append(Link("label:"+label, "/labels/"+label))
+        links.append(Link("label:"+(label["id"]), "/labels/"+label["id"]))
 
     links.append(Link("label:add", "/label/add"))
     links.append(Link("label:{la}", "/sender/logout"))
@@ -280,15 +261,13 @@ def add_label():
 
     if g.authorization is None:
         errors.append("Brak autoryzacji")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
-
 
     if form_values is None:
         errors.append("Brak pliku JSON")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
-
     links = []
     links.append(Link("dashboard", "/sender/dashboard"))
     links.append(Link("label:add", "/label/add"))
@@ -298,12 +277,10 @@ def add_label():
     delivery_id = form_values.get("delivery_id")
     size = form_values.get("size")
     label_id = uuid4()
-
     if not is_database_available():
         errors.append("Błąd połączenia z bazą danych")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
-
     if not name:
         errors.append("Brak nazwy odbiorcy")
 
@@ -312,19 +289,15 @@ def add_label():
 
     if not size:
         errors.append("Brak rozmiaru")
-
     if len(errors) > 0:
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
-
     if name and delivery_id and size:
         success = save_label(label_id, name, delivery_id, size)
-
     if not success:
         errors.append("Błąd tworzenia etykiety")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
-
     document = Document(links=links)
     return document.to_json(), 200
 
@@ -339,7 +312,7 @@ def show_label(lid):
 
     if not db.hexists(f"label:{lid}", "id"):
         errors.append("Taka etykieta nie istnieje")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
     label = {
@@ -363,14 +336,14 @@ def delete_label(lid):
 
     if not db.hexists(f"label:{lid}", "id"):
         errors.append("Taka etykieta nie istnieje")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
     sender = db.hget(f"label:{lid}", "sender").decode()
 
     if g.authorization.get("usr") != sender:
         errors.append("Błąd autoryzacji")
-        document = Document(data=errors, links=links)
+        document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
     db.delete(f"label:{lid}")

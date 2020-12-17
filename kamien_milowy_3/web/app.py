@@ -89,16 +89,16 @@ def registration():
 
     response = webservice("POST", "/sender/register", new_user)
 
-    json = response.json()
+    if response.status_code == 200:
+        return redirect(url_for('login_form'))
+    else:
+        json = response.json()
 
-    errors = json.get("errors")
+        errors = json.get("errors")
 
-    if errors:
         for error in errors:
             flash(error)
-    return redirect(url_for('registration_form'))
-
-    return redirect(url_for('login_form'))
+        return redirect(url_for('registration_form'))
 
 
 @app.route('/sender/login', methods=["GET"])
@@ -111,22 +111,26 @@ def login_form():
 
 @app.route('/sender/login', methods=["POST"])
 def login():
-    login = request.form.get("login")
-    password = request.form.get("password")
+    user = {}
 
-    if not is_database_available():
-        flash("Błąd połączenia z bazą danych")
-        return redirect(url_for('login_form'))
+    user["login"] = request.form.get("login")
+    user["password"] = request.form.get("password")
 
-    if not login or not password:
-        flash("Brak nazwy użytkownika lub hasła")
-        return redirect(url_for('login_form'))
-    if not verify_user(login, password):
-        flash("Błędna nazwa użytkownika i/lub hasła")
-        return redirect(url_for('login_form'))
+    response = webservice("POST", "/sender/login", user)
+    json = response.json()
 
-    session["login"] = login
-    session["logged-at"] = datetime.now()
+    if response.status_code == 200:
+        session["token"] = response.json().get("token")
+        session["login"] = user.get("login")
+        session["logged-at"] = datetime.now()
+        return redirect(url_for('dashboard'))
+    else:
+
+        errors = json.get("errors")
+
+        for error in errors:
+            flash(error)
+        return redirect(url_for('login_form'))
 
     return redirect(url_for('dashboard'))
 
@@ -137,27 +141,40 @@ def dashboard():
         flash("Najpierw musisz się zalogować")
         return redirect(url_for('login_form'))
 
-    labels = {}
+    response = webservice("GET", "/sender/dashboard", {})
+    json = response.json()
 
-    for key in db.scan_iter("label:*"):
-        print("KEY + ")
-        print(key)
+    if response.status_code == 200:
 
-        if (db.hget(key, "sender") == session.get('login')):
-            labels[db.hget(key, "id").decode()] = {
-                "id": db.hget(key, "id").decode(),
-                "name": db.hget(key, "name").decode(),
-                "delivery_id": db.hget(key, "delivery_id").decode(),
-                "size": db.hget(key, "size").decode()
-            }
+        labels = json.get("labels")
 
-    delete_tokens = {}
+        print(labels)
+        i=1
+        for label in labels:
+            label["canBeDeleted"] = True if i>1 else False
+            label["status"] = "w drodze"
+            print("*******************")
+            print(label)
+            i=i+1
+        print(labels)
+        return render_template("dashboard.html", labels=labels, haslabels=(len(labels) > 0))
 
-    for label in labels:
-        delete_tokens[label] = generate_delete_token(label, session.get('login')).decode()
+        # labels_names = []
+        #
+        # for label in labels:
+        #     labels_names.append(label)
+        #
+        #
+        # return render_template("dashboard.html", labels=labels_names, haslabels=(len(labels) > 0))
 
-    return render_template("dashboard.html", labels=labels.items(), haslabels=(len(labels) > 0),
-                           delete_tokens=delete_tokens)
+
+    else:
+
+        errors = json.get("errors")
+
+        for error in errors:
+            flash(error)
+        return redirect(url_for('dashboard'))
 
 
 @app.route('/label/add', methods=['GET'])
@@ -171,35 +188,22 @@ def add_label_form():
 
 @app.route('/label/add', methods=['POST'])
 def add_label():
-    name = request.form.get("name")
-    delivery_id = request.form.get("delivary_id")
-    size = request.form.get("size")
-    label_id = uuid4()
+    new_label = {}
+    new_label["name"] = request.form.get("name")
+    new_label["delivery_id"] = request.form.get("delivary_id")
+    new_label["size"] = request.form.get("size")
 
-    if not is_database_available():
-        flash("Błąd połączenia z bazą danych")
+    response = webservice("POST", "/label/add", new_label)
+    json = response.json()
+
+    if response.status_code == 200:
+        return redirect(url_for('dashboard'))
+    else:
+        errors = json.get("errors")
+
+        for error in errors:
+            flash(error)
         return redirect(url_for('add_label_form'))
-
-    if not name:
-        flash("Brak danych odbiorcy")
-        return redirect(url_for('add_label_form'))
-
-    if not delivery_id:
-        flash("Brak id punktu odbioru")
-        return redirect(url_for('add_label_form'))
-
-    if not size:
-        flash("Brak wybranego rozmiaru")
-        return redirect(url_for('add_label_form'))
-
-    if name and delivery_id and size:
-        success = save_label(label_id, name, delivery_id, size)
-
-    if not success:
-        flash("Błąd tworzenia paczki")
-        return redirect(url_for('add_label_form'))
-
-    return redirect(url_for('dashboard'))
 
 
 @app.route('/labels/<lid>', methods=["GET"])

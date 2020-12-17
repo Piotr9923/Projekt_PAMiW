@@ -119,6 +119,11 @@ th.more{
 	border-color: yellowgreen;
 }
 
+th.status{
+width: 20%;
+	border-color: yellowgreen;
+}
+
 .flashes{
 	text-align: center;
 	background-color: red;
