@@ -16,6 +16,8 @@ load_dotenv('.env')
 REDIS_HOST = getenv("REDIS_HOST")
 REDIS_PASS = getenv("REDIS_PASS")
 WEBSERVICE_URL = getenv("WEBSERVICE_URL")
+JWT_SECRET = getenv("JWT_SECRET")
+
 
 if WEBSERVICE_URL is None:
     WEBSERVICE_URL = "http://127.0.0.1:5000"
@@ -31,6 +33,12 @@ app.secret_key = getenv("SECRET_KEY")
 app.debug = False
 
 
+def session_expired():
+    session.clear()
+    flash("Twoja sesja wygasła. Zaloguj się ponownie.")
+    return redirect(url_for("login_form"))
+
+
 def webservice(method, url, json):
     token = ""
     if session.get("token"):
@@ -42,11 +50,14 @@ def webservice(method, url, json):
     url = WEBSERVICE_URL + url
     try:
         if method == "GET":
-            return requests.get(url, json=json, headers=headers)
+            response = requests.get(url, json=json, headers=headers)
         elif method == "POST":
-            return requests.post(url, json=json, headers=headers)
+            response = requests.post(url, json=json, headers=headers)
         elif method == "DELETE":
-            return requests.delete(url, json=json, headers=headers)
+            response = requests.delete(url, json=json, headers=headers)
+
+        return response
+
     except Exception as e:
         print("Wystąpił błąd: "+str(e))
         flash("Błąd łączności z usługą sieciową")
@@ -89,6 +100,9 @@ def registration():
 
     response = webservice("POST", "/sender/register", new_user)
 
+    if response.status_code == 440:
+        return session_expired()
+
     if response.status_code == 200:
         return redirect(url_for('login_form'))
     else:
@@ -117,12 +131,17 @@ def login():
     user["password"] = request.form.get("password")
 
     response = webservice("POST", "/sender/login", user)
+
+    if response.status_code == 440:
+        return session_expired()
+
     json = response.json()
 
     if response.status_code == 200:
         session["token"] = response.json().get("token")
         session["login"] = user.get("login")
         session["logged-at"] = datetime.now()
+        session["session_expired"] = response.json().get("session_expired")
         return redirect(url_for('dashboard'))
     else:
 
@@ -142,36 +161,25 @@ def dashboard():
         return redirect(url_for('login_form'))
 
     response = webservice("GET", "/sender/dashboard", {})
+
+    if response.status_code == 440:
+        return session_expired()
+
     json = response.json()
 
     if response.status_code == 200:
 
         labels = json.get("labels")
 
-        print(labels)
         i=1
         for label in labels:
             label["canBeDeleted"] = True if i>1 else False
             label["status"] = "w drodze"
-            print("*******************")
-            print(label)
             i=i+1
-        print(labels)
         return render_template("dashboard.html", labels=labels, haslabels=(len(labels) > 0))
 
-        # labels_names = []
-        #
-        # for label in labels:
-        #     labels_names.append(label)
-        #
-        #
-        # return render_template("dashboard.html", labels=labels_names, haslabels=(len(labels) > 0))
-
-
     else:
-
         errors = json.get("errors")
-
         for error in errors:
             flash(error)
         return redirect(url_for('dashboard'))
@@ -194,6 +202,10 @@ def add_label():
     new_label["size"] = request.form.get("size")
 
     response = webservice("POST", "/label/add", new_label)
+
+    if response.status_code == 440:
+        return session_expired()
+
     json = response.json()
 
     if response.status_code == 200:

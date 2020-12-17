@@ -6,7 +6,7 @@ from bcrypt import hashpw, gensalt, checkpw
 from redis import StrictRedis
 from datetime import datetime, timedelta
 from uuid import uuid4
-from jwt import encode, decode
+from jwt import encode, decode, ExpiredSignatureError
 from redis.exceptions import ConnectionError
 import jwt
 from flask_hal import HAL
@@ -29,7 +29,7 @@ SESSION_TYPE = "redis"
 SESSION_REDIS = db
 SESSION_COOKIE_HTTPONLY = True
 JWT_SECRET = getenv("JWT_SECRET")
-JWT_TIME = 30000
+JWT_TIME = 10
 app.config.from_object(__name__)
 app.secret_key = getenv("SECRET_KEY")
 
@@ -42,8 +42,12 @@ def before():
     if token is not None:
         try:
             g.authorization = decode(token, str(JWT_SECRET), algorithms=["HS256"])
-
             print("Authorized " + str(g.authorization))
+        except ExpiredSignatureError:
+            links = [Link("login", "sender/login")]
+            document = Document(links=links)
+            return document.to_json(), 440
+
         except Exception as e:
             print("Unauthorized " + str(e))
             g.authorization = {}
