@@ -23,7 +23,7 @@ else:
     WEBSERVICE_URL = getenv("WEBSERVICE_URL")
 
 if WEBSERVICE_URL is None:
-    WEBSERVICE_URL = "http://127.0.0.1:5000"
+    WEBSERVICE_URL = "http://webservice:8000"
 
 SESSION_TYPE = "filesystem"
 SESSION_COOKIE_HTTPONLY = True
@@ -51,6 +51,7 @@ def webservice(method, url, json):
     headers["Authorization"] = token
 
     url = WEBSERVICE_URL + url
+
     try:
         if method == "GET":
             response = requests.get(url, json=json, headers=headers)
@@ -61,7 +62,7 @@ def webservice(method, url, json):
         return response
 
     except Exception as e:
-        print("Wystąpił błąd: "+str(e))
+        print("Wystąpił błąd: "+str(e), flush=True)
         return "ERROR"
 
 
@@ -254,12 +255,9 @@ def show_label(lid):
         return session_expired()
 
     json = response.json()
-    print(json)
     if response.status_code == 200:
 
         label = json.get("label")
-
-        print(label)
 
         return render_template("label.html", label=label)
 
@@ -288,7 +286,7 @@ def delete_label(lid):
         return session_expired()
 
     json = response.json()
-    print(json)
+
     if response.status_code != 200:
         errors = json.get("errors")
         for error in errors:

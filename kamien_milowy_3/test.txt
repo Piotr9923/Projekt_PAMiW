@@ -1,0 +1,3 @@
+SECRET_KEY='adnsoSIDASONDSianoads3278da8sada87dsaa%%^@'
+JWT_SECRET="SECERET"
+WEBSERVICE_URL=http://webservice:5000

@@ -51,14 +51,12 @@ def before():
     if token is not None:
         try:
             g.authorization = decode(token, str(JWT_SECRET), algorithms=["HS256"])
-            print("Authorized " + str(g.authorization))
         except ExpiredSignatureError:
             links = [Link("login", "sender/login")]
             document = Document(links=links)
             return document.to_json(), 440
 
         except Exception as e:
-            print("Unauthorized " + str(e))
             g.authorization = {}
     else:
         g.authorization = {}
@@ -91,7 +89,6 @@ def save_user(firstname, lastname, login, email, password, adress):
 
 
 def save_label(id, name, delivery_id, size):
-    print(g.authorization.get("usr"))
     id = str(id)
     db.hset(f"label:{id}", "id", id)
     db.hset(f"label:{id}", "name", name)
@@ -171,7 +168,6 @@ def registration():
             document = Document(data={"errors": errors}, links=links)
             return document.to_json(), 400
     else:
-        print("ZWRACAM ERRORS: " + str(errors))
         document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
@@ -359,8 +355,6 @@ def show_label(lid):
     }
 
     labels["label"] = label
-
-    print(labels)
 
     document = Document(data=labels, links=links)
     return document.to_json(), 200
