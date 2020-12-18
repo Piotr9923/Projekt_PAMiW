@@ -6,14 +6,21 @@ from datetime import datetime
 from jwt import decode
 import jwt
 import requests
+import os
 
-load_dotenv('.env')
+is_local = load_dotenv('.env')
 
-REDIS_HOST = getenv("REDIS_HOST")
-REDIS_PASS = getenv("REDIS_PASS")
-WEBSERVICE_URL = getenv("WEBSERVICE_URL")
-JWT_SECRET = getenv("JWT_SECRET")
+if is_local is None:
+    REDIS_HOST = os.environ.get("REDIS_HOST")
+    REDIS_PASS = os.environ.get("REDIS_PASS")
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+    WEBSERVICE_URL = os.environ.get("WEBSERVICE_URL")
 
+else:
+    REDIS_HOST = getenv("REDIS_HOST")
+    REDIS_PASS = getenv("REDIS_PASS")
+    SECRET_KEY = getenv("SECRET_KEY")
+    WEBSERVICE_URL = getenv("WEBSERVICE_URL")
 
 if WEBSERVICE_URL is None:
     WEBSERVICE_URL = "http://127.0.0.1:5000"

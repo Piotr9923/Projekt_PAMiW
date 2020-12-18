@@ -8,30 +8,41 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 from jwt import encode, decode, ExpiredSignatureError
 from redis.exceptions import ConnectionError
-import jwt
 from flask_hal import HAL
 from flask_hal.document import Document, Embedded
 from flask_hal.link import Link
-import json
+import os
 
 app = Flask(__name__)
 HAL(app)
-load_dotenv('.env')
+is_local = load_dotenv('.env')
 
-REDIS_HOST = getenv("REDIS_HOST")
-REDIS_PASS = getenv("REDIS_PASS")
+
+if is_local is None:
+    REDIS_HOST = os.environ.get("REDIS_HOST")
+    REDIS_PASS = os.environ.get("REDIS_PASS")
+    SECRET_KEY = os.environ.get("SECRET_KEY")
+    JWT_SECRET = os.environ.get("JWT_SECRET")
+
+else:
+    REDIS_HOST = getenv("REDIS_HOST")
+    REDIS_PASS = getenv("REDIS_PASS")
+    SECRET_KEY = getenv("SECRET_KEY")
+    JWT_SECRET = getenv("JWT_SECRET")
+
 if REDIS_HOST:
     db = StrictRedis(REDIS_HOST, db=25, password=REDIS_PASS, port=6379)
 else:
     db = StrictRedis(host='redis', port=6379, db=0)
 
+print(db)
+
 SESSION_TYPE = "redis"
 SESSION_REDIS = db
 SESSION_COOKIE_HTTPONLY = True
-JWT_SECRET = getenv("JWT_SECRET")
 JWT_TIME = 600
 app.config.from_object(__name__)
-app.secret_key = getenv("SECRET_KEY")
+app.secret_key = SECRET_KEY
 
 app.debug = False
 
