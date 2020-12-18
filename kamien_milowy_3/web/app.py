@@ -44,7 +44,6 @@ def webservice(method, url, json):
     headers["Authorization"] = token
 
     url = WEBSERVICE_URL + url
-    print("________________________________--")
     try:
         if method == "GET":
             response = requests.get(url, json=json, headers=headers)
@@ -52,8 +51,6 @@ def webservice(method, url, json):
             response = requests.post(url, json=json, headers=headers)
         elif method == "DELETE":
             response = requests.delete(url, json=json, headers=headers)
-        print("******************")
-        print(response)
         return response
 
     except Exception as e:
@@ -184,9 +181,8 @@ def dashboard():
 
         i=1
         for label in labels:
-            label["canBeDeleted"] = True if i>1 else False
-            label["status"] = "w drodze"
-            i=i+1
+            label["canBeDeleted"] = True if label["status"]=="Nadana" else False
+
         return render_template("dashboard.html", labels=labels, haslabels=(len(labels) > 0))
 
     else:
@@ -236,51 +232,67 @@ def add_label():
 
 @app.route('/labels/<lid>', methods=["GET"])
 def show_label(lid):
-    if not db.hexists(f"label:{lid}", "id"):
-        flash("Taka etykieta nie istnieje")
+
+    if session.get('login') is None:
+        flash("Najpierw musisz się zalogować")
+        return redirect(url_for('login_form'))
+
+    response = webservice("GET", "/labels/"+str(lid), {})
+
+    if response == "ERROR":
+        session.clear()
+        flash("Błąd łączności z usługą sieciową")
         return redirect(url_for('index'))
 
-    label = {
-        "id": db.hget(f"label:{lid}", "id").decode(),
-        "name": db.hget(f"label:{lid}", "name").decode(),
-        "delivery_id": db.hget(f"label:{lid}", "delivery_id").decode(),
-        "size": db.hget(f"label:{lid}", "size").decode()
-    }
+    if response.status_code == 440:
+        return session_expired()
 
-    return render_template("label.html", label_id=label['id'], name=label['name'], delivery=label['delivery_id'],
-                           size=label['size'])
+    json = response.json()
+    print(json)
+    if response.status_code == 200:
+
+        label = json.get("label")
+
+        print(label)
+
+        return render_template("label.html", label=label)
+
+    else:
+        errors = json.get("errors")
+        for error in errors:
+            flash(error)
+        return redirect(url_for('dashboard'))
 
 
 @app.route('/label/delete/<lid>', methods=["GET"])
 def delete_label(lid):
-    token = request.args.get('token')
 
-    if not db.hexists(f"label:{lid}", "id"):
-        flash("Taka etykieta nie istnieje")
+    if session.get('login') is None:
+        flash("Najpierw musisz się zalogować")
+        return redirect(url_for('login_form'))
+
+    response = webservice("DELETE", "/label/delete/"+str(lid), {})
+
+    if response == "ERROR":
+        session.clear()
+        flash("Błąd łączności z usługą sieciową")
         return redirect(url_for('index'))
 
-    if token is None:
-        flash("Nie masz dostępu do usunięcia etykiety")
-        return redirect(url_for('index'))
+    if response.status_code == 440:
+        return session_expired()
 
-    try:
-        payload = decode(token, JWT_SECRET, algorithms=['HS256'], audience="label delete service")
-    except jwt.InvalidTokenError:
-        flash("Brak dostępu do usunięcia etykiety")
-        return redirect(url_for('index'))
-
-    if lid != payload.get('sub'):
-        flash("Błąd autoryzacji")
-        return redirect(url_for('index'))
-
-    db.delete(f"label:{lid}")
+    json = response.json()
+    print(json)
+    if response.status_code != 200:
+        errors = json.get("errors")
+        for error in errors:
+            flash(error)
 
     return redirect(url_for('dashboard'))
 
 
 @app.route('/sender/logout')
 def sender_logout():
-    db.delete(f"session:{request.cookies.get('session')}")
 
     session.clear()
 

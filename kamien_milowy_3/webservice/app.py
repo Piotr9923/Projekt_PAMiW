@@ -29,7 +29,7 @@ SESSION_TYPE = "redis"
 SESSION_REDIS = db
 SESSION_COOKIE_HTTPONLY = True
 JWT_SECRET = getenv("JWT_SECRET")
-JWT_TIME = 10
+JWT_TIME = 600
 app.config.from_object(__name__)
 app.secret_key = getenv("SECRET_KEY")
 
@@ -82,6 +82,7 @@ def save_user(firstname, lastname, login, email, password, adress):
 
 
 def save_label(id, name, delivery_id, size):
+    print(g.authorization.get("usr"))
     id = str(id)
     db.hset(f"label:{id}", "id", id)
     db.hset(f"label:{id}", "name", name)
@@ -117,7 +118,7 @@ def index():
 @app.route('/sender/register', methods=['POST'])
 def registration():
     form_values = request.json
-    errors=[]
+    errors = []
     if form_values is None:
         return {"error": "Brak JSON"}
 
@@ -236,17 +237,22 @@ def dashboard():
 
     for key in db.scan_iter("label:*"):
         if db.hget(key, "sender").decode() == login:
-            label={}
+
+            status = db.hget(f"package:{db.hget(key, 'id').decode()}", "status")
+            if status is None:
+                status = "Nadana"
+            label = {}
             label = {
                 "id": db.hget(key, "id").decode(),
                 "name": db.hget(key, "name").decode(),
                 "delivery_id": db.hget(key, "delivery_id").decode(),
-                "size": db.hget(key, "size").decode()
+                "size": db.hget(key, "size").decode(),
+                "status": status
             }
             labels.append(label)
 
     for label in labels:
-        links.append(Link("label:"+(label["id"]), "/labels/"+label["id"]))
+        links.append(Link("label:" + (label["id"]), "/labels/" + label["id"]))
 
     links.append(Link("label:add", "/label/add"))
     links.append(Link("label:{la}", "/sender/logout"))
@@ -308,29 +314,50 @@ def add_label():
 
 @app.route('/labels/<lid>', methods=["GET"])
 def show_label(lid):
-    errors=[]
+    errors = []
     links = []
+    labels = {}
     links.append(Link("dashboard", "/sender/dashboard"))
     links.append(Link("label:add", "/label/add"))
-    links.append(Link("label:{la}", "/sender/logout"))
+
+    login = g.authorization.get("usr")
+
+    if login is None:
+        errors.append("Musisz się zalogować")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 401
 
     if not db.hexists(f"label:{lid}", "id"):
         errors.append("Taka etykieta nie istnieje")
         document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 404
 
+    if login != db.hget(f"label:{lid}", "sender").decode():
+        errors.append("To nie Twoja etykieta")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 401
+
+    status = db.hget(f"package:{lid}", "status")
+    if status is None:
+        status = "Nadana"
+
     label = {
         "id": db.hget(f"label:{lid}", "id").decode(),
         "name": db.hget(f"label:{lid}", "name").decode(),
         "delivery_id": db.hget(f"label:{lid}", "delivery_id").decode(),
-        "size": db.hget(f"label:{lid}", "size").decode()
+        "size": db.hget(f"label:{lid}", "size").decode(),
+        "status": status
     }
 
-    document = Document(data=label, links=links)
+    labels["label"] = label
+
+    print(labels)
+
+    document = Document(data=labels, links=links)
     return document.to_json(), 200
 
 
-@app.route('/label/delete/<lid>', methods=["GET"])
+@app.route('/label/delete/<lid>', methods=["DELETE"])
 def delete_label(lid):
     errors = []
     links = []
@@ -338,17 +365,27 @@ def delete_label(lid):
     links.append(Link("label:add", "/label/add"))
     links.append(Link("label:{la}", "/sender/logout"))
 
+    login = g.authorization.get("usr")
+
+    if login is None:
+        errors.append("Musisz się zalogować")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 401
+
     if not db.hexists(f"label:{lid}", "id"):
         errors.append("Taka etykieta nie istnieje")
         document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
 
-    sender = db.hget(f"label:{lid}", "sender").decode()
-
-    if g.authorization.get("usr") != sender:
-        errors.append("Błąd autoryzacji")
+    if login != db.hget(f"label:{lid}", "sender").decode():
+        errors.append("To nie Twoja etykieta")
         document = Document(data={"errors": errors}, links=links)
-        return document.to_json(), 400
+        return document.to_json(), 401
+
+    if db.hexists(f"package:{lid}", "id"):
+        errors.append("Nie możesz usunąć tej etykiety")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 401
 
     db.delete(f"label:{lid}")
 
