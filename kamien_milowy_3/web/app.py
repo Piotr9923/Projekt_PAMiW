@@ -186,9 +186,8 @@ def dashboard():
 
         labels = json.get("labels")
 
-        i=1
         for label in labels:
-            label["canBeDeleted"] = True if label["status"]=="Nadana" else False
+            label["canBeDeleted"] = True if label["status"] == "Nadana" else False
 
         return render_template("dashboard.html", labels=labels, haslabels=(len(labels) > 0))
 

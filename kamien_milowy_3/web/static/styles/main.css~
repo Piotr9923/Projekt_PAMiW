@@ -110,17 +110,22 @@ tr.empty{
 
 
 th.id{
-	width: 70%;
+	width: 46%;
 	border-color: yellowgreen;
 }
 
 th.more{
-	width: 20%;
+	width: 22%;
 	border-color: yellowgreen;
 }
 
 th.status{
-width: 20%;
+width: 22%;
+	border-color: yellowgreen;
+}
+
+th.delete{
+width: 10%;
 	border-color: yellowgreen;
 }
 

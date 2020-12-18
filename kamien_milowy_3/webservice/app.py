@@ -35,8 +35,6 @@ if REDIS_HOST:
 else:
     db = StrictRedis(host='redis', port=6379, db=0)
 
-print(db)
-
 SESSION_TYPE = "redis"
 SESSION_REDIS = db
 SESSION_COOKIE_HTTPONLY = True
