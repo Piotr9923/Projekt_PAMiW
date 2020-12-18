@@ -136,7 +136,7 @@ def registration():
     if not is_database_available():
         errors.append("Błąd połączenia z bazą danych")
         document = Document(data={"errors": errors}, links=links)
-        return document.to_json(), 400
+        return document.to_json(), 500
 
     if not firstname:
         errors.append("Brak imienia")
@@ -169,7 +169,7 @@ def registration():
     if not success:
         errors.append("Wystąpił błąd podczas rejestracji. Spróbuj później")
         document = Document(data={"errors": errors}, links=links)
-        return document.to_json(), 400
+        return document.to_json(), 500
 
     document = Document(links=links)
     return document.to_json(), 200
@@ -192,7 +192,7 @@ def login():
     if not is_database_available():
         errors.append("Błąd połączenia z bazą danych")
         document = Document(data={"errors": errors}, links=links)
-        return document.to_json(), 400
+        return document.to_json(), 500
 
     if not login or not password:
         errors.append("Brak loginu lub hasła")
@@ -232,7 +232,7 @@ def dashboard():
     if login is None:
         errors.append("Brak autoryzacji")
         document = Document(data={"errors": errors}, links=links)
-        return document.to_json(), 400
+        return document.to_json(), 401
 
     for key in db.scan_iter("label:*"):
         if db.hget(key, "sender").decode() == login:
@@ -266,7 +266,7 @@ def add_label():
     if g.authorization is None:
         errors.append("Brak autoryzacji")
         document = Document(data={"errors": errors}, links=links)
-        return document.to_json(), 400
+        return document.to_json(), 401
 
     if form_values is None:
         errors.append("Brak pliku JSON")
@@ -284,7 +284,7 @@ def add_label():
     if not is_database_available():
         errors.append("Błąd połączenia z bazą danych")
         document = Document(data={"errors": errors}, links=links)
-        return document.to_json(), 400
+        return document.to_json(), 500
     if not name:
         errors.append("Brak nazwy odbiorcy")
 
@@ -301,7 +301,7 @@ def add_label():
     if not success:
         errors.append("Błąd tworzenia etykiety")
         document = Document(data={"errors": errors}, links=links)
-        return document.to_json(), 400
+        return document.to_json(), 500
     document = Document(links=links)
     return document.to_json(), 200
 
@@ -317,7 +317,7 @@ def show_label(lid):
     if not db.hexists(f"label:{lid}", "id"):
         errors.append("Taka etykieta nie istnieje")
         document = Document(data={"errors": errors}, links=links)
-        return document.to_json(), 400
+        return document.to_json(), 404
 
     label = {
         "id": db.hget(f"label:{lid}", "id").decode(),

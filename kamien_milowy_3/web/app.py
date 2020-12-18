@@ -2,12 +2,8 @@ from flask import Flask, request, make_response, session
 from dotenv import load_dotenv
 from flask import render_template, flash, url_for
 from os import getenv
-from bcrypt import hashpw, gensalt, checkpw
-from redis import StrictRedis
 from datetime import datetime
-from uuid import uuid4
-from jwt import encode, decode
-from redis.exceptions import ConnectionError
+from jwt import decode
 import jwt
 import requests
 
@@ -48,6 +44,7 @@ def webservice(method, url, json):
     headers["Authorization"] = token
 
     url = WEBSERVICE_URL + url
+    print("________________________________--")
     try:
         if method == "GET":
             response = requests.get(url, json=json, headers=headers)
@@ -55,12 +52,13 @@ def webservice(method, url, json):
             response = requests.post(url, json=json, headers=headers)
         elif method == "DELETE":
             response = requests.delete(url, json=json, headers=headers)
-
+        print("******************")
+        print(response)
         return response
 
     except Exception as e:
         print("Wystąpił błąd: "+str(e))
-        flash("Błąd łączności z usługą sieciową")
+        return "ERROR"
 
 
 def redirect(url, status=301):
@@ -100,6 +98,11 @@ def registration():
 
     response = webservice("POST", "/sender/register", new_user)
 
+    if response == "ERROR":
+        session.clear()
+        flash("Błąd łączności z usługą sieciową")
+        return redirect(url_for('index'))
+
     if response.status_code == 440:
         return session_expired()
 
@@ -132,6 +135,11 @@ def login():
 
     response = webservice("POST", "/sender/login", user)
 
+    if response == "ERROR":
+        session.clear()
+        flash("Błąd łączności z usługą sieciową")
+        return redirect(url_for('index'))
+
     if response.status_code == 440:
         return session_expired()
 
@@ -151,8 +159,6 @@ def login():
             flash(error)
         return redirect(url_for('login_form'))
 
-    return redirect(url_for('dashboard'))
-
 
 @app.route('/sender/dashboard')
 def dashboard():
@@ -161,6 +167,11 @@ def dashboard():
         return redirect(url_for('login_form'))
 
     response = webservice("GET", "/sender/dashboard", {})
+
+    if response == "ERROR":
+        session.clear()
+        flash("Błąd łączności z usługą sieciową")
+        return redirect(url_for('index'))
 
     if response.status_code == 440:
         return session_expired()
@@ -202,6 +213,11 @@ def add_label():
     new_label["size"] = request.form.get("size")
 
     response = webservice("POST", "/label/add", new_label)
+
+    if response == "ERROR":
+        session.clear()
+        flash("Błąd łączności z usługą sieciową")
+        return redirect(url_for('index'))
 
     if response.status_code == 440:
         return session_expired()
