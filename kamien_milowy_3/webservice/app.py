@@ -261,7 +261,7 @@ def dashboard():
             labels.append(label)
 
     for label in labels:
-        links.append(Link("label:" + (label["id"]), "/labels/" + label["id"]))
+        links.append(Link("label:" + (label["id"]), "/labels/" + label["id"]+"/info"))
 
     links.append(Link("label:add", "/label/add"))
     links.append(Link("label:{la}", "/sender/logout"))
@@ -321,7 +321,7 @@ def add_label():
     return document.to_json(), 200
 
 
-@app.route('/labels/<lid>', methods=["GET"])
+@app.route('/label/<lid>/info', methods=["GET"])
 def show_label(lid):
     errors = []
     links = []
@@ -366,7 +366,7 @@ def show_label(lid):
     return document.to_json(), 200
 
 
-@app.route('/label/delete/<lid>', methods=["DELETE"])
+@app.route('/label/<lid>/delete', methods=["DELETE"])
 def delete_label(lid):
     errors = []
     links = []

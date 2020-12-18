@@ -236,14 +236,14 @@ def add_label():
         return redirect(url_for('add_label_form'))
 
 
-@app.route('/labels/<lid>', methods=["GET"])
+@app.route('/label/<lid>/info', methods=["GET"])
 def show_label(lid):
 
     if session.get('login') is None:
         flash("Najpierw musisz się zalogować")
         return redirect(url_for('login_form'))
 
-    response = webservice("GET", "/labels/"+str(lid), {})
+    response = webservice("GET", "/label/"+str(lid)+"/info", {})
 
     if response == "ERROR":
         session.clear()
@@ -270,14 +270,14 @@ def show_label(lid):
         return redirect(url_for('dashboard'))
 
 
-@app.route('/label/delete/<lid>', methods=["GET"])
+@app.route('/label/<lid>/delete', methods=["GET"])
 def delete_label(lid):
 
     if session.get('login') is None:
         flash("Najpierw musisz się zalogować")
         return redirect(url_for('login_form'))
 
-    response = webservice("DELETE", "/label/delete/"+str(lid), {})
+    response = webservice("DELETE", "/label/"+str(lid)+"/delete", {})
 
     if response == "ERROR":
         session.clear()

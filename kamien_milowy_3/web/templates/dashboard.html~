@@ -42,9 +42,9 @@
    	<tr class="label">
 			<th class="id"><b>Id etykiety: {{label["id"]}}</b></th>
 			<th class="status"><b>{{label["status"]}}</b></th>
-			<th class="more"><a href="/labels/{{label['id']}}">Wyświetl szczegóły</a></th>
+			<th class="more"><a href="/label/{{label['id']}}/info">Wyświetl szczegóły</a></th>
 			{% if label["canBeDeleted"] %}
-			<th class="delete"><a href="/label/delete/{{label['id']}}">Usuń</a></th>	
+			<th class="delete"><a href="/label/{{label['id']}}/delete">Usuń</a></th>	
 			{% else %}
 			<th class="delete"></th>	
 			{% endif %}
