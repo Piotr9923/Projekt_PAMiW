@@ -98,6 +98,16 @@ def save_label(id, name, delivery_id, size):
     return True
 
 
+def create_package(label):
+    id = str(label_id)
+    db.hset(f"package:{id}", "id", id)
+    db.hset(f"label:{id}", "name", name)
+    db.hset(f"label:{id}", "delivery_id", delivery_id)
+    db.hset(f"label:{id}", "size", size)
+    db.hset(f"label:{id}", "sender", g.authorization.get("usr"))
+    return True
+
+
 def verify_user(login, password):
     password = password.encode()
     hashed = db.hget(f"user:{login}", "password")
@@ -485,6 +495,72 @@ def get_package():
 
     document = Document(data=data, links=links)
     return document.to_json(), 200
+
+
+@app.route('/packages', methods=["POST"])
+def get_package():
+    data = {}
+    links = []
+    packages = []
+    errors = []
+
+    login = g.authorization.get("usr")
+
+    if login is None or login != "Courier":
+        errors.append("Brak autoryzacji")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 401
+
+    label_id = request.json['label_id']
+
+    if label_id is None:
+        errors.append("Brak etykiety")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 400
+
+    links = []
+    links.append(Link("dashboard", "/sender/dashboard"))
+    links.append(Link("label:add", "/label/add"))
+
+    if not is_database_available():
+        errors.append("Błąd połączenia z bazą danych")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 500
+
+    if not db.hexists(f"label:{label_id}", "id"):
+        errors.append("Taka etykieta nie istnieje")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 404
+
+    status = db.hget(f"package:{lid}", "status")
+    if status is None:
+        status = "W drodze"
+    else:
+        errors.append("Istnieje paczka utworzona z tej etykiety")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 404
+
+    label = {
+        "id": db.hget(f"label:{lid}", "id").decode(),
+        "name": db.hget(f"label:{lid}", "name").decode(),
+        "delivery_id": db.hget(f"label:{lid}", "delivery_id").decode(),
+        "size": db.hget(f"label:{lid}", "size").decode(),
+        "status": status
+    }
+
+    success = create_package(label_id)
+
+    if not success:
+        errors.append("Błąd tworzenia etykiety")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 500
+    document = Document(links=links)
+    return document.to_json(), 200
+
+
+    document = Document(links=links)
+    return document.to_json(), 200
+
 
 
 if __name__ == '__main__':

@@ -57,6 +57,7 @@ def show_help():
     print("'all' - wyświetlenie wszystkich etykiet i paczek")
     print("'labels' - wyświetlenie wszystkich etykiet, które nie zostały nadane")
     print("'packages' - wyświetlenie wszystkich paczek")
+    print("'create' - utworzenie paczki")
     print("'exit' - wyjście z programu")
 
 
@@ -110,6 +111,21 @@ def show_packages():
         print(table_view.table)
 
 
+def show_create_package():
+    label_id = input("ID etykiety: ")
+
+    correct_create = create_package(label_id)
+
+    if correct_create:
+        print("Poprawnie utworzono paczkę")
+    else:
+        print("Wystąpił błąd podczas tworzenia paczki")
+
+
+def create_package(label_id):
+    print("Etykieta: "+ label_id)
+    return True
+
 clear()
 
 while True:
@@ -128,6 +144,8 @@ while True:
         show_packages()
     elif choice == "all":
         show_lables(False)
+    elif choice == "create":
+        show_create_package()
     elif choice == "exit":
         exit_app()
     else:
