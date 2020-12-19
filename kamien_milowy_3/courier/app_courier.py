@@ -18,7 +18,6 @@ def get_labels(is_not_send):
         if response.status_code == 200:
             return response.json()["labels"]
         else:
-            print("Wystąpił błąd/błędy:")
             for error in response.json()("errors"):
                 print(error)
             return "ERROR"
@@ -34,7 +33,6 @@ def get_packages():
         if response.status_code == 200:
             return response.json()['packages']
         else:
-            print("Wystąpił błąd/błędy:")
             for error in response.json()["errors"]:
                 print(error)
             return "ERROR"
@@ -50,7 +48,21 @@ def create_package(label_id):
         if response.status_code == 200:
             return True
         else:
-            print("Wystąpił błąd/błędy:")
+            for error in response.json()["errors"]:
+                print(error)
+            return "ERROR"
+    except Exception as e:
+        print("Wystąpił błąd połączenia z usługą sieciową")
+        return "ERROR"
+
+
+def change_status(package_id):
+    try:
+        url = WEBSERVICE_URL + "/packages/" + package_id + "/update"
+        response = requests.put(url, json={"package_id": package_id}, headers=HEADER)
+        if response.status_code == 200:
+            return True
+        else:
             for error in response.json()["errors"]:
                 print(error)
             return "ERROR"
@@ -73,7 +85,7 @@ def show_help():
     print("'all' - wyświetlenie wszystkich etykiet i paczek")
     print("'labels' - wyświetlenie wszystkich etykiet, które nie zostały nadane")
     print("'packages' - wyświetlenie wszystkich paczek")
-    print("'create' - utworzenie paczki")
+    print("'create-package' - utworzenie paczki")
     print("'exit' - wyjście z programu")
 
 
@@ -134,10 +146,25 @@ def show_create_package():
     correct_create = create_package(label_id)
 
     if correct_create == True:
+        print("")
         print("Poprawnie utworzono paczkę")
     else:
         print("")
         print("Paczka nie została utworzona")
+
+
+def show_change_status():
+    package_id = input("ID paczki: ")
+
+    correct_create = change_status(package_id)
+
+    if correct_create == True:
+        print("")
+        print("Poprawnie zmieniono status paczki")
+    else:
+        print("")
+        print("Status paczki nie został zmieniony")
+
 
 
 clear()
@@ -158,8 +185,10 @@ while True:
         show_packages()
     elif choice == "all":
         show_lables(False)
-    elif choice == "create":
+    elif choice == "create-package":
         show_create_package()
+    elif choice == "change-status":
+        show_change_status();
     elif choice == "exit":
         exit_app()
     else:

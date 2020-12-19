@@ -570,6 +570,58 @@ def add_package():
     return document.to_json(), 200
 
 
+@app.route('/packages/<pid>/update', methods=["PUT"])
+def update_package(pid):
+    errors = []
+    links = []
+    labels = {}
+    links.append(Link("dashboard", "/sender/dashboard"))
+    links.append(Link("label:add", "/label/add"))
+
+    login = g.authorization.get("usr")
+
+    if login is None or login != "Courier":
+        errors.append("Brak autoryzacji")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 401
+
+    package_id = request.json['package_id']
+
+    if package_id is None:
+        errors.append("Brak Id paczki")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 400
+
+    links = []
+    links.append(Link("dashboard", "/sender/dashboard"))
+    links.append(Link("label:add", "/label/add"))
+
+    if not is_database_available():
+        errors.append("Błąd połączenia z bazą danych")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 500
+
+    if not db.hexists(f"package:{package_id}", "id"):
+        errors.append("Taka paczka nie istnieje")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 404
+
+    status = db.hget(f"package:{package_id}", "status").decode()
+    if status == "Odebrana":
+        errors.append("Ta paczka została odebrana. Nie możesz zmienić jej statusu")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 404
+
+    if status == "W drodze":
+        db.hset(f"package:{package_id}", "status", "Dostarczona")
+    elif status == "Dostarczona":
+        db.hset(f"package:{package_id}", "status", "Odebrana")
+
+
+    document = Document(data=labels, links=links)
+    return document.to_json(), 200
+
+
 
 if __name__ == '__main__':
     app.run(threaded=True, port=5000)

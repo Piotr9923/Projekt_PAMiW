@@ -1,3 +1,7 @@
+##Informacje ogólne:
+- zmiana statusu przesyłki następuje w kolejności "W drodze" -> "Dostarczona" -> "Odebrana" 
+
+
 ## Aplikacja dla klienta (możliwości uruchomienia):
 #### 1) Heroku
 Aplikację została wdrożona na Heroku i jest dostępna pod linkiem:
