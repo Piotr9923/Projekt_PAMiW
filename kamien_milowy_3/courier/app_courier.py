@@ -25,7 +25,7 @@ def get_labels(is_not_send):
         if response.status_code == 200:
             return response.json()["labels"]
         else:
-            for error in response.json()("errors"):
+            for error in response.json()["errors"]:
                 print(error)
             return "ERROR"
     except Exception as e:
@@ -65,7 +65,7 @@ def create_package(label_id):
 
 def change_status(package_id):
     try:
-        url = WEBSERVICE_URL + "/packages/" + package_id + "/update"
+        url = WEBSERVICE_URL + "/packages/" + package_id
         response = requests.put(url, json={"package_id": package_id}, headers=HEADER)
         if response.status_code == 200:
             return True
@@ -74,6 +74,7 @@ def change_status(package_id):
                 print(error)
             return "ERROR"
     except Exception as e:
+        print(e)
         print("Wystąpił błąd połączenia z usługą sieciową")
         return "ERROR"
 

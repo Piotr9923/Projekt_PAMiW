@@ -14,13 +14,23 @@
         <ul id="menu">
            	<li id="strona_glowna"><a href="/">Strona główna</a></li>
             <li id="przesylki"><a href="/sender/dashboard">Moje etykiety</a></li>
-            <li id="dodaj"><a href="/label/add">Utwórz etykietę</a> </li>
+            <li id="dodaj"><a href="/labels/add">Utwórz etykietę</a> </li>
             <li id="wyloguj"><a href="/sender/logout">Wyloguj się</a> </li>
         </ul>
     </nav>
 </header>
 
 <body>
+
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			<ul class=flashes>
+ 			{% for message in messages %}
+ 				<li>{{ message }}</li>
+ 			{% endfor %}
+ 			</ul>
+ 		{% endif %}
+	{% endwith %}
 
     <h1>Witaj na naszej stronie internetowej</h1>
     <h3>O nas</h3>

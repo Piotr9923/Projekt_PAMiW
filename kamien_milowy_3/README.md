@@ -17,9 +17,9 @@ W wierszu poleceń należy wpisać "sh run_web_app.sh local"
 ## Aplikacja dla kuriera (możliwości uruchomienia):
 
 #### 1) Usługa sieciowa z heroku:
-W katalogu "courier" należy wpisać polecenie "python3 app_courier"
+W katalogu "courier" należy wpisać polecenie "python3 app_courier.py"
 
 #### 2) Lokalna usługa sieciowa:
 W jednym terminalu należy przejść do katalogu "webservice" i wpisać "python3 app.py".
-W drugim terminalu w katalogu "courier" należy wpisać polecenie "python3 app_courier local"
+W drugim terminalu w katalogu "courier" należy wpisać polecenie "python3 app_courier.py local"
 

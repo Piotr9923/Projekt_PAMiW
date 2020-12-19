@@ -110,12 +110,12 @@ tr.empty{
 
 
 th.id{
-	width: 46%;
+	width: 48%;
 	border-color: yellowgreen;
 }
 
 th.more{
-	width: 22%;
+	width: 20%;
 	border-color: yellowgreen;
 }
 
@@ -128,6 +128,15 @@ th.delete{
 width: 10%;
 	border-color: yellowgreen;
 }
+
+
+.delete_button{
+	color: red;
+	background-color: yellowgreen;
+	width: 50%;
+	border: none;
+}
+
 
 .flashes{
 	text-align: center;

@@ -4,7 +4,7 @@
 
 <head>
     <title>Rejestracja</title>
-    <link rel="stylesheet" href="/static/styles/registration.css">
+    <link rel="stylesheet" href="/static/styles/input_form.css">
 </head>
 
 <header>

@@ -1,10 +1,11 @@
-<!doctype>
+<!doctype html>
 
 <html>
 
 <head>
     <title>Firma kurierska "Paczuszka"</title>
-    <link rel="stylesheet" href="/static/styles/main.css">    
+    <link rel="stylesheet" href="/static/styles/main.css"> 
+        <script src="/static/scripts/delete_label.js" defer></script>   
 </head>
 
 <header>
@@ -14,7 +15,7 @@
         <ul id="menu">
            	<li id="strona_glowna"><a href="/">Strona główna</a></li>
             <li id="przesylki"><a href="/sender/dashboard">Moje etykiety</a></li>
-            <li id="dodaj"><a href="/label/add">Utwórz etykietę</a> </li>
+            <li id="dodaj"><a href="/labels/add">Utwórz etykietę</a> </li>
             <li id="wyloguj"><a href="/sender/logout">Wyloguj się</a> </li>
         </ul>
     </nav>
@@ -42,9 +43,9 @@
    	<tr class="label">
 			<th class="id"><b>Id etykiety: {{label["id"]}}</b></th>
 			<th class="status"><b>{{label["status"]}}</b></th>
-			<th class="more"><a href="/label/{{label['id']}}/info">Wyświetl szczegóły</a></th>
+			<th class="more"><a href="/labels/{{label['id']}}">Wyświetl szczegóły</a></th>
 			{% if label["canBeDeleted"] %}
-			<th class="delete"><a href="/label/{{label['id']}}/delete">Usuń</a></th>	
+			<th class="delete"><button class="delete_button" value={{label['id']}}>Usuń</button></th>
 			{% else %}
 			<th class="delete"></th>	
 			{% endif %}

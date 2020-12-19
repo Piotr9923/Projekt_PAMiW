@@ -129,6 +129,15 @@ width: 10%;
 	border-color: yellowgreen;
 }
 
+
+.delete_button{
+	color: blue;
+	background-color: yellowgreen;
+	width: 50%;
+	border: none;
+}
+
+
 .flashes{
 	text-align: center;
 	background-color: red;

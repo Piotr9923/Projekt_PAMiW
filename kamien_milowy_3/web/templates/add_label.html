@@ -1,4 +1,4 @@
-<!doctype>
+<!doctype html>
 
 <html>
 
@@ -13,7 +13,7 @@
         <ul id="menu">
            	<li id="strona_glowna"><a href="/">Strona główna</a></li>
             <li id="przesylki"><a href="/sender/dashboard">Moje etykiety</a></li>
-            <li id="dodaj"><a href="/label/add">Utwórz etykietę</a> </li>
+            <li id="dodaj"><a href="/labels/add">Utwórz etykietę</a> </li>
             <li id="wyloguj"><a href="/sender/logout">Wyloguj się</a> </li>
         </ul>
     </nav>
@@ -31,7 +31,7 @@
  		{% endif %}
 	{% endwith %}
 		
-    <form id="add_label" method="POST" action="/label/add"
+    <form id="add_label" method="POST" action="/labels"
         enctype="multipart/form-data">
         <ul>
             <li>

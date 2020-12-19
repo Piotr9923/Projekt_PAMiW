@@ -3,8 +3,6 @@ from dotenv import load_dotenv
 from flask import render_template, flash, url_for
 from os import getenv
 from datetime import datetime
-from jwt import decode
-import jwt
 import requests
 import os
 
@@ -199,7 +197,7 @@ def dashboard():
         return redirect(url_for('dashboard'))
 
 
-@app.route('/label/add', methods=['GET'])
+@app.route('/labels/add', methods=['GET'])
 def add_label_form():
     if session.get('login') is None:
         flash("Najpierw musisz się zalogować")
@@ -208,14 +206,14 @@ def add_label_form():
     return render_template("add_label.html")
 
 
-@app.route('/label/add', methods=['POST'])
+@app.route('/labels', methods=['POST'])
 def add_label():
     new_label = {}
     new_label["name"] = request.form.get("name")
     new_label["delivery_id"] = request.form.get("delivary_id")
     new_label["size"] = request.form.get("size")
 
-    response = webservice("POST", "/label/add", new_label)
+    response = webservice("POST", "/labels", new_label)
 
     if response == "ERROR":
         session.clear()
@@ -237,14 +235,14 @@ def add_label():
         return redirect(url_for('add_label_form'))
 
 
-@app.route('/label/<lid>/info', methods=["GET"])
+@app.route('/labels/<lid>', methods=["GET"])
 def show_label(lid):
 
     if session.get('login') is None:
         flash("Najpierw musisz się zalogować")
         return redirect(url_for('login_form'))
 
-    response = webservice("GET", "/label/"+str(lid)+"/info", {})
+    response = webservice("GET", "/labels/"+str(lid), {})
 
     if response == "ERROR":
         session.clear()
@@ -268,19 +266,19 @@ def show_label(lid):
         return redirect(url_for('dashboard'))
 
 
-@app.route('/label/<lid>/delete', methods=["GET"])
+@app.route('/labels/<lid>', methods=["DELETE"])
 def delete_label(lid):
 
     if session.get('login') is None:
         flash("Najpierw musisz się zalogować")
-        return redirect(url_for('login_form'))
+        return redirect(url_for('login_form'),status=400)
 
-    response = webservice("DELETE", "/label/"+str(lid)+"/delete", {})
+    response = webservice("DELETE", "/labels/"+str(lid), {})
 
     if response == "ERROR":
         session.clear()
         flash("Błąd łączności z usługą sieciową")
-        return redirect(url_for('index'))
+        return redirect(url_for('index'), status=500)
 
     if response.status_code == 440:
         return session_expired()
@@ -292,7 +290,7 @@ def delete_label(lid):
         for error in errors:
             flash(error)
 
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('dashboard'), status=200)
 
 
 @app.route('/sender/logout')

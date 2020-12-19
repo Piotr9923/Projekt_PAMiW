@@ -1,6 +1,5 @@
-from flask import Flask, request, make_response, g
+from flask import Flask, request, g
 from dotenv import load_dotenv
-from flask import render_template, flash, url_for
 from os import getenv
 from bcrypt import hashpw, gensalt, checkpw
 from redis import StrictRedis
@@ -277,7 +276,7 @@ def dashboard():
             labels.append(label)
 
     for label in labels:
-        links.append(Link("label:" + (label["id"]), "/labels/" + label["id"]+"/info"))
+        links.append(Link("label:" + (label["id"]), "/labels/" + label["id"]+""))
 
     links.append(Link("label:add", "/label/add"))
     links.append(Link("label:{la}", "/sender/logout"))
@@ -288,7 +287,7 @@ def dashboard():
     return document.to_json(), 200
 
 
-@app.route('/label/add', methods=['POST'])
+@app.route('/labels', methods=['POST'])
 def add_label():
     form_values = request.json
 
@@ -337,7 +336,7 @@ def add_label():
     return document.to_json(), 200
 
 
-@app.route('/label/<lid>/info', methods=["GET"])
+@app.route('/labels/<lid>', methods=["GET"])
 def show_label(lid):
     errors = []
     links = []
@@ -382,7 +381,7 @@ def show_label(lid):
     return document.to_json(), 200
 
 
-@app.route('/label/<lid>/delete', methods=["DELETE"])
+@app.route('/labels/<lid>', methods=["DELETE"])
 def delete_label(lid):
     errors = []
     links = []
@@ -456,7 +455,7 @@ def get_labels():
             labels.append(label)
 
     for label in labels:
-        links.append(Link("label:" + (label["id"]), "/labels/" + label["id"] + "/info"))
+        links.append(Link("label:" + (label["id"]), "/labels/" + label["id"]))
 
     links.append(Link("label:add", "/label/add"))
     links.append(Link("label:{la}", "/sender/logout"))
@@ -499,7 +498,7 @@ def get_package():
         packages.append(package)
 
     for package in packages:
-        links.append(Link("label:" + (package["id"]), "/labels/" + package["id"] + "/info"))
+        links.append(Link("label:" + (package["id"]), "/labels/" + package["id"]))
 
     links.append(Link("package:{la}", "/sender/logout"))
 
@@ -570,7 +569,7 @@ def add_package():
     return document.to_json(), 200
 
 
-@app.route('/packages/<pid>/update', methods=["PUT"])
+@app.route('/packages/<pid>', methods=["PUT"])
 def update_package(pid):
     errors = []
     links = []
