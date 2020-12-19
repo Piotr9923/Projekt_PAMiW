@@ -99,12 +99,20 @@ def save_label(id, name, delivery_id, size):
 
 
 def create_package(label):
-    id = str(label_id)
+
+    id = label['id']
+    name = label['name']
+    delivery_id = label['delivery_id']
+    size = label['size']
+    sender = label['sender']
+    status = "W drodze"
+
     db.hset(f"package:{id}", "id", id)
-    db.hset(f"label:{id}", "name", name)
-    db.hset(f"label:{id}", "delivery_id", delivery_id)
-    db.hset(f"label:{id}", "size", size)
-    db.hset(f"label:{id}", "sender", g.authorization.get("usr"))
+    db.hset(f"package:{id}", "name", name)
+    db.hset(f"package:{id}", "delivery_id", delivery_id)
+    db.hset(f"package:{id}", "size", size)
+    db.hset(f"package:{id}", "sender", sender)
+    db.hset(f"package:{id}", "status", status)
     return True
 
 
@@ -255,7 +263,9 @@ def dashboard():
 
             status = db.hget(f"package:{db.hget(key, 'id').decode()}", "status")
             if status is None:
-                status = "Nadana"
+                status = "Utworzona"
+            else:
+                status = status.decode()
             label = {}
             label = {
                 "id": db.hget(key, "id").decode(),
@@ -354,7 +364,9 @@ def show_label(lid):
 
     status = db.hget(f"package:{lid}", "status")
     if status is None:
-        status = "Nadana"
+        status = "Utworzona"
+    else:
+        status = status.decode()
 
     label = {
         "id": db.hget(f"label:{lid}", "id").decode(),
@@ -425,7 +437,9 @@ def get_labels():
     for key in db.scan_iter("label:*"):
         status = db.hget(f"package:{db.hget(key, 'id').decode()}", "status")
         if status is None:
-            status = "Nadana"
+            status = "Utworzona"
+        else:
+            status = status.decode()
         label = {}
         label = {
             "id": db.hget(key, "id").decode(),
@@ -436,7 +450,7 @@ def get_labels():
             "sender": db.hget(key, "sender").decode()
         }
         if is_not_send:
-            if(status == "Nadana"):
+            if(status == "Utworzona"):
                 labels.append(label)
         else:
             labels.append(label)
@@ -470,7 +484,9 @@ def get_package():
     for key in db.scan_iter("package:*"):
         status = db.hget(f"package:{db.hget(key, 'id').decode()}", "status")
         if status is None:
-            status = "Nadana"
+            status = "Utworzona"
+        else:
+            status = status.decode()
         package = {}
         package = {
             "id": db.hget(key, "id").decode(),
@@ -480,11 +496,7 @@ def get_package():
             "status": status,
             "sender": db.hget(key, "sender").decode()
         }
-        if is_not_send:
-            if(status == "Nadana"):
-                packages.append(package)
-        else:
-            packages.append(package)
+        packages.append(package)
 
     for package in packages:
         links.append(Link("label:" + (package["id"]), "/labels/" + package["id"] + "/info"))
@@ -498,10 +510,8 @@ def get_package():
 
 
 @app.route('/packages', methods=["POST"])
-def get_package():
-    data = {}
+def add_package():
     links = []
-    packages = []
     errors = []
 
     login = g.authorization.get("usr")
@@ -532,23 +542,21 @@ def get_package():
         document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 404
 
-    status = db.hget(f"package:{lid}", "status")
-    if status is None:
-        status = "W drodze"
-    else:
+    status = db.hget(f"package:{label_id}", "status")
+    if status is not None:
         errors.append("Istnieje paczka utworzona z tej etykiety")
         document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 404
 
     label = {
-        "id": db.hget(f"label:{lid}", "id").decode(),
-        "name": db.hget(f"label:{lid}", "name").decode(),
-        "delivery_id": db.hget(f"label:{lid}", "delivery_id").decode(),
-        "size": db.hget(f"label:{lid}", "size").decode(),
-        "status": status
+        "id": db.hget(f"label:{label_id}", "id").decode(),
+        "name": db.hget(f"label:{label_id}", "name").decode(),
+        "delivery_id": db.hget(f"label:{label_id}", "delivery_id").decode(),
+        "size": db.hget(f"label:{label_id}", "size").decode(),
+        "sender": db.hget(f"label:{label_id}", "sender").decode()
     }
 
-    success = create_package(label_id)
+    success = create_package(label)
 
     if not success:
         errors.append("Błąd tworzenia etykiety")

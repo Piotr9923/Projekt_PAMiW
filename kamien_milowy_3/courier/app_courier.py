@@ -19,7 +19,7 @@ def get_labels(is_not_send):
             return response.json()["labels"]
         else:
             print("Wystąpił błąd/błędy:")
-            for error in response.json().get("errors"):
+            for error in response.json()("errors"):
                 print(error)
             return "ERROR"
     except Exception as e:
@@ -35,7 +35,23 @@ def get_packages():
             return response.json()['packages']
         else:
             print("Wystąpił błąd/błędy:")
-            for error in response.json.get("errors"):
+            for error in response.json()["errors"]:
+                print(error)
+            return "ERROR"
+    except Exception as e:
+        print("Wystąpił błąd połączenia z usługą sieciową")
+        return "ERROR"
+
+
+def create_package(label_id):
+    try:
+        url = WEBSERVICE_URL + "/packages"
+        response = requests.post(url, json={"label_id":label_id}, headers=HEADER)
+        if response.status_code == 200:
+            return True
+        else:
+            print("Wystąpił błąd/błędy:")
+            for error in response.json()["errors"]:
                 print(error)
             return "ERROR"
     except Exception as e:
@@ -67,6 +83,7 @@ def exit_app():
     print("*             Do widzenia kurierze                 *")
     print("****************************************************")
     exit(0)
+
 
 def show_lables(is_not_send):
     labels = get_labels(is_not_send)
@@ -116,15 +133,12 @@ def show_create_package():
 
     correct_create = create_package(label_id)
 
-    if correct_create:
+    if correct_create == True:
         print("Poprawnie utworzono paczkę")
     else:
-        print("Wystąpił błąd podczas tworzenia paczki")
+        print("")
+        print("Paczka nie została utworzona")
 
-
-def create_package(label_id):
-    print("Etykieta: "+ label_id)
-    return True
 
 clear()
 
