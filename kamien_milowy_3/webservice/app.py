@@ -396,5 +396,96 @@ def delete_label(lid):
     return document.to_json(), 200
 
 
+@app.route('/labels', methods=["GET"])
+def get_labels():
+    data = {}
+    links = []
+    labels = []
+    errors = []
+
+    is_not_send = request.json['is_not_send']
+
+    login = g.authorization.get("usr")
+
+    if login is None or login != "Courier":
+        errors.append("Brak autoryzacji")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 401
+
+    for key in db.scan_iter("label:*"):
+        status = db.hget(f"package:{db.hget(key, 'id').decode()}", "status")
+        if status is None:
+            status = "Nadana"
+        label = {}
+        label = {
+            "id": db.hget(key, "id").decode(),
+            "name": db.hget(key, "name").decode(),
+            "delivery_id": db.hget(key, "delivery_id").decode(),
+            "size": db.hget(key, "size").decode(),
+            "status": status,
+            "sender": db.hget(key, "sender").decode()
+        }
+        if is_not_send:
+            if(status == "Nadana"):
+                labels.append(label)
+        else:
+            labels.append(label)
+
+    for label in labels:
+        links.append(Link("label:" + (label["id"]), "/labels/" + label["id"] + "/info"))
+
+    links.append(Link("label:add", "/label/add"))
+    links.append(Link("label:{la}", "/sender/logout"))
+
+    data["labels"] = labels
+
+    document = Document(data=data, links=links)
+    return document.to_json(), 200
+
+
+@app.route('/packages', methods=["GET"])
+def get_package():
+    data = {}
+    links = []
+    packages = []
+    errors = []
+
+    login = g.authorization.get("usr")
+
+    if login is None or login != "Courier":
+        errors.append("Brak autoryzacji")
+        document = Document(data={"errors": errors}, links=links)
+        return document.to_json(), 401
+
+    for key in db.scan_iter("package:*"):
+        status = db.hget(f"package:{db.hget(key, 'id').decode()}", "status")
+        if status is None:
+            status = "Nadana"
+        package = {}
+        package = {
+            "id": db.hget(key, "id").decode(),
+            "name": db.hget(key, "name").decode(),
+            "delivery_id": db.hget(key, "delivery_id").decode(),
+            "size": db.hget(key, "size").decode(),
+            "status": status,
+            "sender": db.hget(key, "sender").decode()
+        }
+        if is_not_send:
+            if(status == "Nadana"):
+                packages.append(package)
+        else:
+            packages.append(package)
+
+    for package in packages:
+        links.append(Link("label:" + (package["id"]), "/labels/" + package["id"] + "/info"))
+
+    links.append(Link("package:{la}", "/sender/logout"))
+
+    data["packages"] = packages
+
+    document = Document(data=data, links=links)
+    return document.to_json(), 200
+
+
 if __name__ == '__main__':
     app.run(threaded=True, port=5000)
