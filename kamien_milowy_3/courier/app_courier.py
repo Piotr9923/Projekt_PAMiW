@@ -8,6 +8,13 @@ from terminaltables import AsciiTable
 load_dotenv('.env')
 
 WEBSERVICE_URL = getenv("WEBSERVICE_URL")
+
+if len(sys.argv)>1:
+    if sys.argv[1] == "local":
+        WEBSERVICE_URL = getenv("LOCAL_WEBSERVICE_URL")
+
+print(WEBSERVICE_URL)
+
 HEADER = {"Authorization": f"Bearer {getenv('TOKEN')}"}
 
 
@@ -86,6 +93,7 @@ def show_help():
     print("'labels' - wyświetlenie wszystkich etykiet, które nie zostały nadane")
     print("'packages' - wyświetlenie wszystkich paczek")
     print("'create-package' - utworzenie paczki")
+    print("'change-status' - zmiana status paczki")
     print("'exit' - wyjście z programu")
 
 

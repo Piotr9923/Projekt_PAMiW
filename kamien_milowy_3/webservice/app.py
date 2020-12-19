@@ -38,7 +38,7 @@ else:
 SESSION_TYPE = "redis"
 SESSION_REDIS = db
 SESSION_COOKIE_HTTPONLY = True
-JWT_TIME = 600
+JWT_TIME = 300
 app.config.from_object(__name__)
 app.secret_key = SECRET_KEY
 
@@ -617,10 +617,8 @@ def update_package(pid):
     elif status == "Dostarczona":
         db.hset(f"package:{package_id}", "status", "Odebrana")
 
-
     document = Document(data=labels, links=links)
     return document.to_json(), 200
-
 
 
 if __name__ == '__main__':
