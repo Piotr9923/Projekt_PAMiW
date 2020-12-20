@@ -153,27 +153,39 @@ def show_packages():
 def show_create_package():
     label_id = input("ID etykiety: ")
 
-    correct_create = create_package(label_id)
+    if label_id == "":
+        print("")
+        print("Nie podałeś ID etykiety")
 
-    if correct_create == True:
-        print("")
-        print("Poprawnie utworzono paczkę")
     else:
-        print("")
-        print("Paczka nie została utworzona")
+
+        correct_create = create_package(label_id)
+
+        if correct_create == True:
+            print("")
+            print("Poprawnie utworzono paczkę")
+        else:
+            print("")
+            print("Paczka nie została utworzona")
 
 
 def show_change_status():
     package_id = input("ID paczki: ")
 
-    correct_create = change_status(package_id)
+    if package_id == "":
+        print("")
+        print("Nie podałeś ID paczki")
 
-    if correct_create == True:
-        print("")
-        print("Poprawnie zmieniono status paczki")
     else:
-        print("")
-        print("Status paczki nie został zmieniony")
+
+        correct_create = change_status(package_id)
+
+        if correct_create == True:
+            print("")
+            print("Poprawnie zmieniono status paczki")
+        else:
+            print("")
+            print("Status paczki nie został zmieniony")
 
 
 
