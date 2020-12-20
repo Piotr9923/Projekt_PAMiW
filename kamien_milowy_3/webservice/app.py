@@ -132,8 +132,8 @@ def index():
         document = Document(data={}, links=links)
         return document.to_json(), 200
 
-    links.append(Link("dashboard", "/sender/dashboard"))
-    links.append(Link("add_label", "/label/add"))
+    links.append(Link("login", "/sender/login", type="POST"))
+    links.append(Link("registration", "/sender/register", type="POST"))
     document = Document(data={}, links=links)
     return document.to_json(), 200
 
@@ -209,8 +209,8 @@ def login():
 
     links = []
     errors = []
-    links.append(Link("login", "/sender/login"))
-    links.append(Link("register", "/sender/register"))
+    links.append(Link("login", "/sender/login", type="POST"))
+    links.append(Link("registration", "/sender/register", type="POST"))
 
     if not is_database_available():
         errors.append("Błąd połączenia z bazą danych")
@@ -229,9 +229,9 @@ def login():
 
     links = []
     data = {}
-    links.append(Link("dashboard", "/sender/dashboard"))
-    links.append(Link("label:add", "/label/add"))
-    links.append(Link("logout", "/sender/logout"))
+    links.append(Link("labels", "/sender/dashboard", type="GET"))
+    links.append(Link("label:new", "/labels", type="POST"))
+
     payload = {
         "exp": datetime.utcnow() + timedelta(seconds=JWT_TIME),
         "usr": login
@@ -251,6 +251,8 @@ def dashboard():
     errors = []
 
     login = g.authorization.get("usr")
+    links.append(Link("find", "/labels/{id}", templated=True))
+    links.append(Link("label:new", "/labels", type="POST"))
 
     if login is None:
         errors.append("Brak autoryzacji")
@@ -273,17 +275,20 @@ def dashboard():
                 "size": db.hget(key, "size").decode(),
                 "status": status
             }
+
             labels.append(label)
 
+    items = []
     for label in labels:
-        links.append(Link("label:" + (label["id"]), "/labels/" + label["id"]+""))
+        item_links = []
+        link_info = Link("info", "/labels/" + label["id"], type="GET")
+        item_links.append(link_info)
+        if label["status"] == "Utworzona":
+            link_delete = Link("delete", "/labels/" + label["id"], type="DELETE")
+            item_links.append(link_delete)
+        items.append(Embedded(data=label, links=item_links))
 
-    links.append(Link("label:add", "/label/add"))
-    links.append(Link("label:{la}", "/sender/logout"))
-
-    data["labels"] = labels
-    data["login"] = login
-    document = Document(data=data, links=links)
+    document = Document(embedded={'labels' : Embedded(data=items)}, links=links)
     return document.to_json(), 200
 
 
@@ -303,9 +308,7 @@ def add_label():
         document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
     links = []
-    links.append(Link("dashboard", "/sender/dashboard"))
-    links.append(Link("label:add", "/label/add"))
-    links.append(Link("label:{la}", "/sender/logout"))
+    links.append(Link("labels", "/sender/dashboard", type="GET"))
 
     name = form_values.get("name")
     delivery_id = form_values.get("delivery_id")
@@ -341,9 +344,8 @@ def show_label(lid):
     errors = []
     links = []
     labels = {}
-    links.append(Link("dashboard", "/sender/dashboard"))
-    links.append(Link("label:add", "/label/add"))
-
+    links.append(Link("labels", "/sender/dashboard", type="GET"))
+    links.append(Link("delete", "/labels/" + str(lid), type="DELETE"))
     login = g.authorization.get("usr")
 
     if login is None:
@@ -385,9 +387,8 @@ def show_label(lid):
 def delete_label(lid):
     errors = []
     links = []
-    links.append(Link("dashboard", "/sender/dashboard"))
-    links.append(Link("label:add", "/label/add"))
-    links.append(Link("label:{la}", "/sender/logout"))
+    links.append(Link("labels", "/sender/dashboard", type="GET"))
+    links.append(Link("label:new", "/labels", type="POST"))
 
     login = g.authorization.get("usr")
 
@@ -424,7 +425,12 @@ def get_labels():
     labels = []
     errors = []
 
-    is_not_send = request.json['is_not_send']
+    is_not_send = request.headers.get('is_not_send')
+
+    if is_not_send == "True":
+        is_not_send = True
+    else:
+        is_not_send = False
 
     login = g.authorization.get("usr")
 
@@ -457,10 +463,9 @@ def get_labels():
     for label in labels:
         links.append(Link("label:" + (label["id"]), "/labels/" + label["id"]))
 
-    links.append(Link("label:add", "/label/add"))
-    links.append(Link("label:{la}", "/sender/logout"))
-
     data["labels"] = labels
+
+    links.append(Link("find", "/label/{id}", templated=True))
 
     document = Document(data=data, links=links)
     return document.to_json(), 200
@@ -500,9 +505,10 @@ def get_package():
     for package in packages:
         links.append(Link("label:" + (package["id"]), "/labels/" + package["id"]))
 
-    links.append(Link("package:{la}", "/sender/logout"))
-
     data["packages"] = packages
+
+    links.append(Link("package:new", "/pacakges", type="POST"))
+    links.append(Link("find", "/pacakges/{id}", templated=True, type="GET"))
 
     document = Document(data=data, links=links)
     return document.to_json(), 200
@@ -528,8 +534,8 @@ def add_package():
         return document.to_json(), 400
 
     links = []
-    links.append(Link("dashboard", "/sender/dashboard"))
-    links.append(Link("label:add", "/label/add"))
+    links.append(Link("packages", "/pacakges", type="GET"))
+    links.append(Link("find", "/pacakges/{id}", templated=True, type="GET"))
 
     if not is_database_available():
         errors.append("Błąd połączenia z bazą danych")
@@ -574,8 +580,9 @@ def update_package(pid):
     errors = []
     links = []
     labels = {}
-    links.append(Link("dashboard", "/sender/dashboard"))
-    links.append(Link("label:add", "/label/add"))
+    links.append(Link("packages", "/pacakges", type="GET"))
+    links.append(Link("package:new", "/pacakges", type="POST"))
+    links.append(Link("find", "/pacakges/{id}", templated=True, type="GET"))
 
     login = g.authorization.get("usr")
 
@@ -590,10 +597,6 @@ def update_package(pid):
         errors.append("Brak Id paczki")
         document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 400
-
-    links = []
-    links.append(Link("dashboard", "/sender/dashboard"))
-    links.append(Link("label:add", "/label/add"))
 
     if not is_database_available():
         errors.append("Błąd połączenia z bazą danych")

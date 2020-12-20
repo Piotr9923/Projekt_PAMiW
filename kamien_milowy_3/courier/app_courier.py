@@ -20,8 +20,10 @@ HEADER = {"Authorization": f"Bearer {getenv('TOKEN')}"}
 
 def get_labels(is_not_send):
     try:
+        header = HEADER
+        header["is_not_send"] = str(is_not_send)
         url = WEBSERVICE_URL + "/labels"
-        response = requests.get(url, json={"is_not_send": is_not_send}, headers=HEADER)
+        response = requests.get(url, headers=header)
         if response.status_code == 200:
             return response.json()["labels"]
         else:
@@ -29,6 +31,7 @@ def get_labels(is_not_send):
                 print(error)
             return "ERROR"
     except Exception as e:
+        print(e)
         print("Wystąpił błąd połączenia z usługą sieciową")
         return "ERROR"
 
@@ -180,7 +183,7 @@ clear()
 
 while True:
     print("")
-    choice = input("Choice: ")
+    choice = input(">> ")
 
     if choice == "help":
         show_help()

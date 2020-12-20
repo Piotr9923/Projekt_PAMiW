@@ -2,11 +2,12 @@ var buttons = document.getElementsByTagName("button")
 
 function attach_events() {
     for(i=0;i< buttons.length;i++){
+        console.log(buttons[i].href)
         buttons[i].addEventListener("click", function(ev){
             
-            var label_id = this.value
+            var link = this.value
             var xhr = new XMLHttpRequest();
-            xhr.open("DELETE", "/labels/" + label_id);
+            xhr.open("DELETE", link);
             xhr.onload = function (e) {
                 var DONE = 4;
                 if (xhr.readyState == DONE) {

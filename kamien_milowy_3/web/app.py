@@ -183,7 +183,7 @@ def dashboard():
 
     if response.status_code == 200:
 
-        labels = json.get("labels")
+        labels = json.get("_embedded")["labels"]
 
         for label in labels:
             label["canBeDeleted"] = True if label["status"] == "Utworzona" else False

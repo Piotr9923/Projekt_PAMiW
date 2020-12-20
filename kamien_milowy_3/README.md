@@ -1,5 +1,5 @@
 ## Informacje ogólne:
-- zmiana statusu przesyłki następuje w kolejności "W drodze" -> "Dostarczona" -> "Odebrana"
+- zmiana statusu paczki następuje w kolejności: "W drodze" -> "Dostarczona" -> "Odebrana"
 - usługa sieciowa działa pod adresem https://peaceful-taiga-22196.herokuapp.com/
 
 

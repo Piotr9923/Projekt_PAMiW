@@ -41,11 +41,11 @@
    	{% for label in labels %}
    	
    	<tr class="label">
-			<th class="id"><b>Id etykiety: {{label["id"]}}</b></th>
+			<th class="id"><b>Id: {{label["id"]}}</b></th>
 			<th class="status"><b>{{label["status"]}}</b></th>
-			<th class="more"><a href="/labels/{{label['id']}}">Wyświetl szczegóły</a></th>
+			<th class="more"><a href="{{label['_links']['info']['href']}}">Wyświetl szczegóły</a></th>
 			{% if label["canBeDeleted"] %}
-			<th class="delete"><button class="delete_button" value={{label['id']}}>Usuń</button></th>
+			<th class="delete"><button class="delete_button" href="{{label['_links']['info']['href']}}" value={{label['_links']['delete']['href']}}>Usuń</button></th>
 			{% else %}
 			<th class="delete"></th>	
 			{% endif %}
