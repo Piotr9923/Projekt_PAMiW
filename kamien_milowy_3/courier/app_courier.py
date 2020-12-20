@@ -31,7 +31,6 @@ def get_labels(is_not_send):
                 print(error)
             return "ERROR"
     except Exception as e:
-        print(e)
         print("Wystąpił błąd połączenia z usługą sieciową")
         return "ERROR"
 
@@ -77,7 +76,6 @@ def change_status(package_id):
                 print(error)
             return "ERROR"
     except Exception as e:
-        print(e)
         print("Wystąpił błąd połączenia z usługą sieciową")
         return "ERROR"
 
