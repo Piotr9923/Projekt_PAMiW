@@ -4,16 +4,20 @@ import sys
 from dotenv import load_dotenv
 from os import getenv
 from terminaltables import AsciiTable
+import getpass
 
 load_dotenv('.env')
 
 WEBSERVICE_URL = getenv("WEBSERVICE_URL")
+AUTH0_CLIENT_ID = getenv("AUTH0_CLIENT_ID")
+AUTH0_CLIENT_SECRET = getenv("AUTH0_CLIENT_SECRET")
+AUTH0_DOMAIN = getenv("AUTH0_DOMAIN")
+AUTH0_BASE_URL = 'https://' + AUTH0_DOMAIN
+AUTH0_AUDIENCE = getenv("AUTH0_AUDIENCE")
 
 if len(sys.argv)>1:
     if sys.argv[1] == "local":
         WEBSERVICE_URL = getenv("LOCAL_WEBSERVICE_URL")
-
-print(WEBSERVICE_URL)
 
 HEADER = {"Authorization": f"Bearer {getenv('TOKEN')}"}
 
@@ -187,6 +191,69 @@ def show_change_status():
             print("")
             print("Status paczki nie został zmieniony")
 
+
+def get_token(access_token, id_token):
+
+    header = {"Access_Token": f"Bearer {access_token}", "ID_Token": f"Bearer {id_token}"}
+
+    try:
+        url = WEBSERVICE_URL + "/courier/token"
+        response = requests.get(url, headers=header)
+
+        if response.status_code == 200:
+            return response.json()["token"]
+        else:
+            print(response.json()["error"])
+            return "ERROR"
+    except Exception as e:
+        print("Wystąpił błąd połączenia z usługą sieciową")
+        return "ERROR"
+
+
+while True:
+    print("Wybierz sposób logowania:\n"
+          "1 - Logowanie stałym żetone\n"
+          "2 - Logowanie za pomocą Auth0\n\n"
+          "Wpisz odpowiednią liczbę: ")
+
+    choice = input("Sposób logowania: ")
+
+    if choice == "1":
+        break
+
+    elif choice == "2":
+        login = input("Login: ")
+        password = getpass.getpass("Hasło: ")
+        header = {"content-type": "application/x-www-form-urlencoded"}
+        payload = {
+            "client_id":AUTH0_CLIENT_ID,
+            "client_secret":AUTH0_CLIENT_SECRET,
+            "audience":AUTH0_AUDIENCE,
+            "grant_type":"password",
+            "username":login,
+            "password":password,
+            "scope":"openid"
+        }
+        response = requests.post(AUTH0_BASE_URL+"/oauth/token", data=payload,headers=header)
+
+        if response.status_code!=200:
+            error = response.json()["error"]
+            if error == "invalid_grant":
+                print("Błędne dane logowania!\n\n")
+        else:
+            access_token = response.json()['access_token']
+            id_token = response.json()['id_token']
+
+            token = get_token(access_token,id_token)
+
+            if token != "ERROR":
+                print("TOKEN WYGENEROWANY: "+ token)
+
+                HEADER = {"Authorization": f"Bearer {token}"}
+                break
+
+    else:
+        print("Błędny wybór!")
 
 
 clear()

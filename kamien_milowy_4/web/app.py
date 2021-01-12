@@ -372,7 +372,7 @@ def sender_logout():
     is_auth0 = False
 
     if session.get("auth0"):
-        is_auth0=True
+        is_auth0 = True
 
     session.clear()
 

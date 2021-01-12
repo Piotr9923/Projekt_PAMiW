@@ -5,12 +5,13 @@ from bcrypt import hashpw, gensalt, checkpw
 from redis import StrictRedis
 from datetime import datetime, timedelta
 from uuid import uuid4
-from jwt import encode, decode, ExpiredSignatureError
+from jwt import encode, decode, ExpiredSignatureError, get_unverified_header
 from redis.exceptions import ConnectionError
 from flask_hal import HAL
 from flask_hal.document import Document, Embedded
 from flask_hal.link import Link
 import os
+import requests
 
 app = Flask(__name__)
 HAL(app)
@@ -22,12 +23,14 @@ if is_local is None:
     REDIS_PASS = os.environ.get("REDIS_PASS")
     SECRET_KEY = os.environ.get("SECRET_KEY")
     JWT_SECRET = os.environ.get("JWT_SECRET")
+    AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
 
 else:
     REDIS_HOST = getenv("REDIS_HOST")
     REDIS_PASS = getenv("REDIS_PASS")
     SECRET_KEY = getenv("SECRET_KEY")
     JWT_SECRET = getenv("JWT_SECRET")
+    AUTH0_DOMAIN = getenv("AUTH0_DOMAIN")
 
 if REDIS_HOST:
     db = StrictRedis(REDIS_HOST, db=25, password=REDIS_PASS, port=6379)
@@ -622,6 +625,47 @@ def update_package(pid):
         db.hset(f"package:{package_id}", "status", "Odebrana")
 
     document = Document(data=labels, links=links)
+    return document.to_json(), 200
+
+
+@app.route('/courier/token', methods=["GET"])
+def generate_token():
+    access_token = request.headers.get("Access_Token", "").replace("Bearer ", "")
+    id_token = request.headers.get("ID_Token", "").replace("Bearer ", "")
+
+    response = requests.get(AUTH0_DOMAIN+"/.well-known/jwks.json")
+
+    if response.status_code != 200:
+        document = Document(data={"error": "Wystąpił błąd. Spróbuj ponownie później."})
+        return document.to_json(), 400
+
+    try:
+        kid = get_unverified_header(access_token)["kid"]
+    except Exception:
+        document = Document(data={"error": "Wystąpił błąd. Spróbuj ponownie później."})
+        return document.to_json(), 400
+
+    for key in response.json()["keys"]:
+        if key["kid"] == kid:
+            public_key = key
+
+    #           Tu poniżej powinno być odkomentowane sprawdznie poprawności żetonu, ale
+    #           podczas dekodowania występował błąd "Expecting a PEM-formatted key."
+    
+    # try:
+    #     decoded = decode(access_token, public_key, algorithm=['RS256'])
+    # except Exception as e:
+    #     print(e, flush=True)
+    #     document = Document(data={"error": "Brak autoryzacji. Spróbuj ponownie później."})
+    #     return document.to_json(), 401
+
+    payload = {
+        "exp": datetime.utcnow() + timedelta(days=365),
+        "usr": "Courier"
+    }
+    token = encode(payload, JWT_SECRET, algorithm='HS256').decode()
+
+    document = Document(data={"token":token})
     return document.to_json(), 200
 
 

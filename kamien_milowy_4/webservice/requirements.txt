@@ -6,3 +6,4 @@ redis
 bcrypt
 PyJWT
 flask_hal
+requests
