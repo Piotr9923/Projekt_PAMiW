@@ -1,0 +1,70 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <title>Firma kurierska "Paczuszka"</title>
+    <link rel="stylesheet" href="/static/styles/main.css"> 
+        <script src="/static/scripts/delete_label.js" defer></script>   
+</head>
+
+<header>
+
+    <a href="/"><img src="/static/images/logo.png" alt="logo"></a>
+    <nav>
+        <ul id="menu">
+           	<li id="strona_glowna"><a href="/">Strona główna</a></li>
+            <li id="przesylki"><a href="/sender/dashboard">Moje etykiety</a></li>
+            <li id="dodaj"><a href="/labels/add">Utwórz etykietę</a> </li>
+            <li id="wyloguj"><a href="/sender/logout">Wyloguj się</a> </li>
+        </ul>
+    </nav>
+</header>
+
+<body>
+
+	{% with messages = get_flashed_messages() %}
+		{% if messages %}
+			<ul class=flashes>
+ 			{% for message in messages %}
+ 				<li>{{ message }}</li>
+ 			{% endfor %}
+ 			</ul>
+ 		{% endif %}
+	{% endwith %}
+
+   
+   {% if haslabels %}
+   <h1>Twoje etykiety paczek:</h1>
+   <br/>
+		 <table>  	
+   	{% for label in labels %}
+   	
+   	<tr class="label">
+			<th class="id"><b>Id: {{label["id"]}}</b></th>
+			<th class="status"><b>{{label["status"]}}</b></th>
+			<th class="more"><a href="{{label['_links']['info']['href']}}">Wyświetl szczegóły</a></th>
+			{% if label["canBeDeleted"] %}
+			<th class="delete"><button class="delete_button" value={{label['_links']['delete']['href']}}>Usuń</button></th>
+			{% else %}
+			<th class="delete"></th>	
+			{% endif %}
+		</tr>
+		<tr class="empty"></tr>
+   	{% endfor %}
+   	 </table>
+   {% else %}
+   	<h2 class="center_text">Nie masz etykiet skojarzonych z Twoim kontem</h2>
+  	{% endif %}
+   
+
+    <footer>2020 | <a href="https://github.com/Piotr9923/Projekt_PAMiW">https://github.com/Piotr9923/Projekt_PAMiW</a> |
+        <a href='https://dryicons.com/'> Icon by Dryicons </a></footer>
+
+
+
+</body>
+
+
+
+</html>

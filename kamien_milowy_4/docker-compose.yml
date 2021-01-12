@@ -1,0 +1,20 @@
+version: '2'
+services:
+  web:
+    build: web
+    ports:
+      - "8000:8000"
+    env_file: web/.env
+    depends_on:
+      - webservice
+  webservice:
+    build: webservice
+    ports:
+      - "5000:5000"
+    env_file: webservice/.env
+    depends_on:
+      - redis
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
