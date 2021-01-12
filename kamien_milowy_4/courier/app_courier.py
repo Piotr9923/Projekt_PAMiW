@@ -194,7 +194,7 @@ def show_change_status():
 
 def get_token(access_token, id_token):
 
-    header = {"Access_Token": f"Bearer {access_token}", "ID_Token": f"Bearer {id_token}"}
+    header = {"Access_Token": access_token, "ID_Token": id_token}
 
     try:
         url = WEBSERVICE_URL + "/courier/token"
@@ -222,8 +222,11 @@ while True:
         break
 
     elif choice == "2":
-        login = input("Login: ")
-        password = getpass.getpass("Hasło: ")
+
+        # login = input("Login: ")
+        #password = getpass.getpass("Hasło: ")
+        login = "kurier@paczuszka.pl"
+        password = "Paczuszka2021"
         header = {"content-type": "application/x-www-form-urlencoded"}
         payload = {
             "client_id":AUTH0_CLIENT_ID,
@@ -245,10 +248,8 @@ while True:
             id_token = response.json()['id_token']
 
             token = get_token(access_token,id_token)
-
+            print("Wygenerowany token: "+token)
             if token != "ERROR":
-                print("TOKEN WYGENEROWANY: "+ token)
-
                 HEADER = {"Authorization": f"Bearer {token}"}
                 break
 

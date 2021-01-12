@@ -12,6 +12,7 @@ from flask_hal.document import Document, Embedded
 from flask_hal.link import Link
 import os
 import requests
+from jwt.jwks_client import PyJWKClient
 
 app = Flask(__name__)
 HAL(app)
@@ -24,6 +25,9 @@ if is_local is None:
     SECRET_KEY = os.environ.get("SECRET_KEY")
     JWT_SECRET = os.environ.get("JWT_SECRET")
     AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
+    AUTH0_AUDIENCE = os.environ.get("AUTH0_AUDIENCE")
+    AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
+
 
 else:
     REDIS_HOST = getenv("REDIS_HOST")
@@ -31,6 +35,8 @@ else:
     SECRET_KEY = getenv("SECRET_KEY")
     JWT_SECRET = getenv("JWT_SECRET")
     AUTH0_DOMAIN = getenv("AUTH0_DOMAIN")
+    AUTH0_AUDIENCE = getenv("AUTH0_AUDIENCE")
+    AUTH0_CLIENT_ID = getenv("AUTH0_CLIENT_ID")
 
 if REDIS_HOST:
     db = StrictRedis(REDIS_HOST, db=25, password=REDIS_PASS, port=6379)
@@ -243,7 +249,7 @@ def login():
     }
     token = encode(payload, JWT_SECRET, algorithm='HS256')
     data["status"] = "logged"
-    data["token"] = token.decode()
+    data["token"] = token
     document = Document(data=data, links=links)
     return document.to_json(), 200
 
@@ -630,8 +636,8 @@ def update_package(pid):
 
 @app.route('/courier/token', methods=["GET"])
 def generate_token():
-    access_token = request.headers.get("Access_Token", "").replace("Bearer ", "")
-    id_token = request.headers.get("ID_Token", "").replace("Bearer ", "")
+    access_token = request.headers.get("Access_Token")
+    id_token = request.headers.get("ID_Token")
 
     response = requests.get(AUTH0_DOMAIN+"/.well-known/jwks.json")
 
@@ -645,25 +651,41 @@ def generate_token():
         document = Document(data={"error": "Wystąpił błąd. Spróbuj ponownie później."})
         return document.to_json(), 400
 
-    for key in response.json()["keys"]:
-        if key["kid"] == kid:
-            public_key = key
+    url = AUTH0_DOMAIN+"/.well-known/jwks.json"
 
-    #           Tu poniżej powinno być odkomentowane sprawdznie poprawności żetonu, ale
-    #           podczas dekodowania występował błąd "Expecting a PEM-formatted key."
-    
-    # try:
-    #     decoded = decode(access_token, public_key, algorithm=['RS256'])
-    # except Exception as e:
-    #     print(e, flush=True)
-    #     document = Document(data={"error": "Brak autoryzacji. Spróbuj ponownie później."})
-    #     return document.to_json(), 401
+    jwks_client = PyJWKClient(url)
+
+    signing_key = jwks_client.get_signing_key_from_jwt(access_token)
+
+    try:
+        data = decode(
+            access_token,
+            signing_key.key,
+            algorithms=["RS256"],
+            audience=AUTH0_AUDIENCE
+        )
+    except Exception as e:
+        document = Document(data={"error": "Brak autoryzacji. Spróbuj ponownie później."})
+        return document.to_json(), 401
+
+    try:
+        data = decode(
+            id_token,
+            signing_key.key,
+            algorithms=["RS256"],
+            audience=AUTH0_CLIENT_ID
+        )
+    except Exception as e:
+        document = Document(data={"error": "Brak autoryzacji. Spróbuj ponownie później."})
+        return document.to_json(), 401
 
     payload = {
         "exp": datetime.utcnow() + timedelta(days=365),
-        "usr": "Courier"
+        "usr": "Courier",
+        "name": data["name"],
+        "sub": data["sub"]
     }
-    token = encode(payload, JWT_SECRET, algorithm='HS256').decode()
+    token = encode(payload, JWT_SECRET, algorithm='HS256')
 
     document = Document(data={"token":token})
     return document.to_json(), 200

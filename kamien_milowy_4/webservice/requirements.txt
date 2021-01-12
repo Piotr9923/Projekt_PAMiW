@@ -4,6 +4,6 @@ gunicorn
 python-dotenv
 redis
 bcrypt
-PyJWT
+PyJWT==2.0.0
 flask_hal
 requests
