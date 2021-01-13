@@ -395,7 +395,7 @@ def notifications():
     if user_notifications.status_code == "ERROR" or (user_notifications.status_code != 200 and user_notifications.status_code != 204):
         return "", user_notifications.status_code
 
-    if not user_notifications:
+    if user_notifications.status_code == 204:
         return "", 204
 
     return user_notifications.json(), 200

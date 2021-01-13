@@ -13,11 +13,11 @@ from flask_hal.link import Link
 import os
 import requests
 from jwt.jwks_client import PyJWKClient
+import time
 
 app = Flask(__name__)
 HAL(app)
 is_local = load_dotenv('.env')
-
 
 if is_local is None:
     REDIS_HOST = os.environ.get("REDIS_HOST")
@@ -107,7 +107,6 @@ def save_label(id, name, delivery_id, size):
 
 
 def create_package(label):
-
     id = label['id']
     name = label['name']
     delivery_id = label['delivery_id']
@@ -248,7 +247,6 @@ def login():
         db.hset(f"user:{login}", "name", form_values.get("name"))
         db.hset(f"user:{login}", "email", form_values.get("email"))
 
-
     payload = {
         "exp": datetime.utcnow() + timedelta(seconds=JWT_TIME),
         "usr": login
@@ -305,7 +303,7 @@ def dashboard():
             item_links.append(link_delete)
         items.append(Embedded(data=label, links=item_links))
 
-    document = Document(embedded={'labels' : Embedded(data=items)}, links=links)
+    document = Document(embedded={'labels': Embedded(data=items)}, links=links)
     return document.to_json(), 200
 
 
@@ -472,7 +470,7 @@ def get_labels():
             "sender": db.hget(key, "sender").decode()
         }
         if is_not_send:
-            if(status == "Utworzona"):
+            if (status == "Utworzona"):
                 labels.append(label)
         else:
             labels.append(label)
@@ -584,9 +582,11 @@ def add_package():
         errors.append("Błąd tworzenia etykiety")
         document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 500
+
+    db.lpush(f"notifications:{label['sender']}", f"Utworzono paczkę o numerze id {label_id}")
+
     document = Document(links=links)
     return document.to_json(), 200
-
 
     document = Document(links=links)
     return document.to_json(), 200
@@ -631,10 +631,14 @@ def update_package(pid):
         document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 404
 
+    sender = db.hget(f"package:{package_id}", "sender").decode()
+
     if status == "W drodze":
         db.hset(f"package:{package_id}", "status", "Dostarczona")
+        db.lpush(f"notifications:{sender}", f"Paczka o numerze id {package_id} zmieniła status na 'Dostarczona'")
     elif status == "Dostarczona":
         db.hset(f"package:{package_id}", "status", "Odebrana")
+        db.lpush(f"notifications:{sender}", f"Paczka o numerze id {package_id} zmieniła status na 'Odebrana'")
 
     document = Document(data=labels, links=links)
     return document.to_json(), 200
@@ -645,7 +649,7 @@ def generate_token():
     access_token = request.headers.get("Access_Token")
     id_token = request.headers.get("ID_Token")
 
-    response = requests.get(AUTH0_DOMAIN+"/.well-known/jwks.json")
+    response = requests.get(AUTH0_DOMAIN + "/.well-known/jwks.json")
 
     if response.status_code != 200:
         document = Document(data={"error": "Wystąpił błąd. Spróbuj ponownie później."})
@@ -657,7 +661,7 @@ def generate_token():
         document = Document(data={"error": "Wystąpił błąd. Spróbuj ponownie później."})
         return document.to_json(), 400
 
-    url = AUTH0_DOMAIN+"/.well-known/jwks.json"
+    url = AUTH0_DOMAIN + "/.well-known/jwks.json"
 
     jwks_client = PyJWKClient(url)
 
@@ -693,24 +697,34 @@ def generate_token():
     }
     token = encode(payload, JWT_SECRET, algorithm='HS256')
 
-    document = Document(data={"token":token})
+    document = Document(data={"token": token})
     return document.to_json(), 200
 
 
 @app.route('/notifications', methods=["GET"])
 def notifications():
-
     login = g.authorization.get("usr")
 
     if login is None:
         return "", 401
 
     user_notifications = {}
-
     notif = []
-    notif.append("pOWIADOMIENIE 1")
-    notif.append("Jakieś testowe poiadomienie 2")
-    user_notifications["notifications"]=notif
+
+    notifications_list = db.lrange(f"notifications:{login}", -1, 10)
+
+    for notification in notifications_list:
+        notif.append(notification.decode())
+
+    if len(notif) == 0:
+        return "", 204
+
+    time.sleep(1)
+
+    for n in notif:
+        db.lrem("notifications:test", 10, n)
+
+    user_notifications["notifications"] = notif
 
     document = Document(data=user_notifications)
     return document.to_json(), 200
