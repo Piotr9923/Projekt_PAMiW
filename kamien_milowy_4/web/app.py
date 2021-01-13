@@ -204,8 +204,10 @@ def callback_handling():
     session["JWT_PAYLOAD"] = userinfo
 
     user = {}
-    user["login"] = userinfo["name"]
+    user["login"] = userinfo["sub"]
     user["auth0"] = True
+    user["name"] = userinfo["name"]
+    user["email"] = userinfo["email"]
 
     response = webservice("POST", "/sender/login", user)
 
@@ -225,6 +227,8 @@ def callback_handling():
         session["logged-at"] = datetime.now()
         session["session_expired"] = response.json().get("session_expired")
         session["auth0"] = True
+
+
 
         return redirect(url_for('dashboard'))
     else:

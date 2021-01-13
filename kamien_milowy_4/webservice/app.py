@@ -243,6 +243,12 @@ def login():
     links.append(Link("labels", "/sender/dashboard", type="GET"))
     links.append(Link("label:new", "/labels", type="POST"))
 
+    if not db.hexists(f"user:{login}", "auth0"):
+        db.hset(f"user:{login}", "auth0", "True")
+        db.hset(f"user:{login}", "name", form_values.get("name"))
+        db.hset(f"user:{login}", "email", form_values.get("email"))
+
+
     payload = {
         "exp": datetime.utcnow() + timedelta(seconds=JWT_TIME),
         "usr": login
