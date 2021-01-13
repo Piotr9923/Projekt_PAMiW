@@ -392,6 +392,9 @@ def notifications():
 
     user_notifications = webservice("GET","/notifications",{})
 
+    if user_notifications.status_code == 440:
+        return "", 440
+
     if user_notifications.status_code == "ERROR" or (user_notifications.status_code != 200 and user_notifications.status_code != 204):
         return "", user_notifications.status_code
 

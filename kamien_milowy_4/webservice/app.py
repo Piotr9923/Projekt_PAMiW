@@ -719,10 +719,8 @@ def notifications():
     if len(notif) == 0:
         return "", 204
 
-    time.sleep(1)
-
     for n in notif:
-        db.lrem("notifications:test", 10, n)
+        db.lrem(f"notifications:{login}", 10, n)
 
     user_notifications["notifications"] = notif
 
