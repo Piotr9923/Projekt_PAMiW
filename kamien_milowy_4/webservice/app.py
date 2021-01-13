@@ -697,5 +697,24 @@ def generate_token():
     return document.to_json(), 200
 
 
+@app.route('/notifications', methods=["GET"])
+def notifications():
+
+    login = g.authorization.get("usr")
+
+    if login is None:
+        return "", 401
+
+    user_notifications = {}
+
+    notif = []
+    notif.append("pOWIADOMIENIE 1")
+    notif.append("Jakieś testowe poiadomienie 2")
+    user_notifications["notifications"]=notif
+
+    document = Document(data=user_notifications)
+    return document.to_json(), 200
+
+
 if __name__ == '__main__':
     app.run(threaded=True, port=5000)
