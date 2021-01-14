@@ -206,6 +206,7 @@ def get_token(access_token, id_token):
             print(response.json()["error"])
             return "ERROR"
     except Exception as e:
+        print(e)
         print("Wystąpił błąd połączenia z usługą sieciową")
         return "ERROR"
 
@@ -223,10 +224,9 @@ while True:
 
     elif choice == "2":
 
-        # login = input("Login: ")
-        #password = getpass.getpass("Hasło: ")
-        login = "kurier@paczuszka.pl"
-        password = "Paczuszka2021"
+        login = input("Login: ")
+        password = getpass.getpass("Hasło: ")
+
         header = {"content-type": "application/x-www-form-urlencoded"}
         payload = {
             "client_id":AUTH0_CLIENT_ID,
@@ -248,7 +248,7 @@ while True:
             id_token = response.json()['id_token']
 
             token = get_token(access_token,id_token)
-            print("Wygenerowany token: "+token)
+
             if token != "ERROR":
                 HEADER = {"Authorization": f"Bearer {token}"}
                 break
