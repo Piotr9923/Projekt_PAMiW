@@ -213,7 +213,7 @@ def get_token(access_token, id_token):
 
 while True:
     print("Wybierz sposób logowania:\n"
-          "1 - Logowanie stałym żetone\n"
+          "1 - Logowanie stałym żetonem\n"
           "2 - Logowanie za pomocą Auth0\n\n"
           "Wpisz odpowiednią liczbę: ")
 
