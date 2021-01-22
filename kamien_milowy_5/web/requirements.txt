@@ -1,0 +1,10 @@
+Flask
+Flask-Session
+gunicorn
+python-dotenv
+redis
+bcrypt
+PyJWT==1.7.1
+requests
+authlib
+six
