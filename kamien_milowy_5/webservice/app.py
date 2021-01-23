@@ -14,6 +14,8 @@ import os
 import requests
 from jwt.jwks_client import PyJWKClient
 import time
+import pika
+import json
 
 app = Flask(__name__)
 HAL(app)
@@ -27,6 +29,10 @@ if is_local is None:
     AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
     AUTH0_AUDIENCE = os.environ.get("AUTH0_AUDIENCE")
     AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
+    Q_HOST = os.environ.get("Q_HOST")
+    Q_LOGIN = os.environ.get("Q_LOGIN")
+    Q_PASSWORD = os.environ.get("Q_PASSWORD")
+    Q_VH = os.environ.get("Q_VH")
 
 
 else:
@@ -37,6 +43,10 @@ else:
     AUTH0_DOMAIN = getenv("AUTH0_DOMAIN")
     AUTH0_AUDIENCE = getenv("AUTH0_AUDIENCE")
     AUTH0_CLIENT_ID = getenv("AUTH0_CLIENT_ID")
+    Q_HOST = getenv("Q_HOST")
+    Q_LOGIN = getenv("Q_LOGIN")
+    Q_PASSWORD = getenv("Q_PASSWORD")
+    Q_VH = getenv("Q_VH")
 
 if REDIS_HOST:
     db = StrictRedis(REDIS_HOST, db=25, password=REDIS_PASS, port=6379)
@@ -51,6 +61,11 @@ app.config.from_object(__name__)
 app.secret_key = SECRET_KEY
 
 app.debug = False
+
+
+credentials = pika.PlainCredentials(Q_LOGIN, Q_PASSWORD)
+
+parameters = pika.ConnectionParameters(Q_HOST, 5672, Q_VH, credentials)
 
 
 @app.before_request
@@ -129,6 +144,29 @@ def verify_user(login, password):
     if not hashed:
         return False
     return checkpw(password, hashed)
+
+
+def add_to_invoices_queue(label):
+    firstname = db.hget(f"user:{label['sender']}", "firstname").decode()
+    lastname = db.hget(f"user:{label['sender']}", "lastname").decode()
+    adress = db.hget(f"user:{label['sender']}", "adress").decode()
+
+    cost = 8.99
+    if label["size"] == "M":
+        cost = 12.99
+    elif label["size"] == "L":
+        cost = 16.99
+    elif label["size"] == "XL":
+        cost = 18.99
+
+    invoke_data = {"sender":f"{firstname} {lastname}","adress":adress,"id":label['id'],"size":label['size'],"cost":cost}
+
+    connection = pika.BlockingConnection(parameters)
+    channel = connection.channel()
+    channel.queue_declare(queue="invoices")
+    channel.basic_publish(exchange='', routing_key="invoices",
+                          body=json.dumps(invoke_data))
+    connection.close()
 
 
 @app.route('/')
@@ -582,6 +620,8 @@ def add_package():
         errors.append("Błąd tworzenia etykiety")
         document = Document(data={"errors": errors}, links=links)
         return document.to_json(), 500
+
+    add_to_invoices_queue(label)
 
     db.lpush(f"notifications:{label['sender']}", f"Utworzono paczkę o numerze id {label_id}")
 

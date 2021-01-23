@@ -22,5 +22,6 @@ W czwartym kamieniu milowym należało do obu aplikacji klienckich zaimplementow
 ### Piąty kamień milowy
 Celem piątego kamienia milowego jest rozbudowanie aplikacji o system komunikatów realizowanych za pomocą kolejki RabbitMQ. Należy rozbudować aplikację kliencką oraz usłgę sieciową tak, aby wysyłały one wiadomości do kolejki komunikatów.
 Należy stworzyć również dwóch odbiorców komunikatów:
--- monitor - wyświetla wszystkie komunikaty o błędach,
--- invoicer - generuje fakturę w postaci pliku tekstowego za każdym razem, gdy paczka zostanie odebrana przez kuriera.
+- monitor - wyświetla wszystkie komunikaty o błędach,
+- invoicer - generuje fakturę w postaci pliku tekstowego za każdym razem, gdy paczka zostanie odebrana przez kuriera.
+
