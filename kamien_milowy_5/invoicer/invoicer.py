@@ -31,7 +31,7 @@ def callback(ch, method, properties, body):
     table = []
     column_name = ["Usługa", "Rozmiar paczki","Wartość [zł]"]
     table.append(column_name)
-    table.append(["Wysyłka paaczki", invoice_data['size'], invoice_data['cost']])
+    table.append(["Wysyłka paczki", invoice_data['size'], invoice_data['cost']])
     table_view = AsciiTable(table)
     file = open(f"faktura_vat_{invoice_data['id']}.txt","w")
     file.write("            FAKTURA VAT \n\n"

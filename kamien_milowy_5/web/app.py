@@ -7,6 +7,7 @@ import requests
 import os
 from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
+import pika
 
 is_local = load_dotenv('.env')
 
@@ -21,6 +22,10 @@ if is_local is None:
     AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
     AUTH0_BASE_URL = 'https://' + AUTH0_DOMAIN
     AUTH0_AUDIENCE = os.environ.get("AUTH0_AUDIENCE")
+    Q_HOST = os.environ.get("Q_HOST")
+    Q_LOGIN = os.environ.get("Q_LOGIN")
+    Q_PASSWORD = os.environ.get("Q_PASSWORD")
+    Q_VH = os.environ.get("Q_VH")
 
 else:
     REDIS_HOST = getenv("REDIS_HOST")
@@ -33,6 +38,10 @@ else:
     AUTH0_DOMAIN = getenv("AUTH0_DOMAIN")
     AUTH0_BASE_URL = 'https://' + AUTH0_DOMAIN
     AUTH0_AUDIENCE = getenv("AUTH0_AUDIENCE")
+    Q_HOST = getenv("Q_HOST")
+    Q_LOGIN = getenv("Q_LOGIN")
+    Q_PASSWORD = getenv("Q_PASSWORD")
+    Q_VH = getenv("Q_VH")
 
 if WEBSERVICE_URL is None:
     WEBSERVICE_URL = "http://webservice:8000"
@@ -60,6 +69,10 @@ auth0 = oauth.register(
         'scope': 'openid profile email',
     },
 )
+
+credentials = pika.PlainCredentials(Q_LOGIN, Q_PASSWORD)
+
+parameters = pika.ConnectionParameters(Q_HOST, 5672, Q_VH, credentials)
 
 
 def session_expired():
@@ -89,6 +102,12 @@ def webservice(method, url, json):
 
     except Exception as e:
         print("Wystąpił błąd: "+str(e), flush=True)
+        connection = pika.BlockingConnection(parameters)
+        channel = connection.channel()
+        channel.queue_declare(queue="errors")
+        channel.basic_publish(exchange='', routing_key="errors",
+                              body=f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} - Błąd połączenia z usługą sieciową")
+        connection.close()
         return "ERROR"
 
 
