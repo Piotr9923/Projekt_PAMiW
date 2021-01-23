@@ -147,9 +147,25 @@ def verify_user(login, password):
 
 
 def add_to_invoices_queue(label):
-    firstname = db.hget(f"user:{label['sender']}", "firstname").decode()
-    lastname = db.hget(f"user:{label['sender']}", "lastname").decode()
-    adress = db.hget(f"user:{label['sender']}", "adress").decode()
+    firstname = db.hget(f"user:{label['sender']}", "firstname")
+    lastname = db.hget(f"user:{label['sender']}", "lastname")
+    adress = db.hget(f"user:{label['sender']}", "adress")
+    
+    if firstname is None:
+        firstname = "Konto Auth0"
+    else:
+        firstname = firstname.decode()
+
+    if lastname is None:
+        lastname = db.hget(f"user:{label['sender']}", "name").decode()
+    else:
+        lastname = lastname.decode()
+
+    if adress is None:
+        adress = db.hget(f"user:{label['sender']}", "email").decode()
+    else:
+        adress = adress.decode()
+
 
     cost = 8.99
     if label["size"] == "M":
@@ -298,7 +314,7 @@ def login():
     links.append(Link("labels", "/sender/dashboard", type="GET"))
     links.append(Link("label:new", "/labels", type="POST"))
 
-    if not db.hexists(f"user:{login}", "auth0"):
+    if auth0 and not db.hexists(f"user:{login}", "auth0"):
         db.hset(f"user:{login}", "auth0", "True")
         db.hset(f"user:{login}", "name", form_values.get("name"))
         db.hset(f"user:{login}", "email", form_values.get("email"))

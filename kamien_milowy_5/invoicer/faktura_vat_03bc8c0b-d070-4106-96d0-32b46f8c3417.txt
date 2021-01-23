@@ -1,0 +1,21 @@
+            FAKTURA VAT 
+
+Data wystawienia:
+23-01-2021
+
+Sprzedawca:
+Firma kurierska 'Paczuszka'
+Piotr Rzewnicki
+
+Odbiorca:
+Piotr Rzewnicki
+Warszawa
+
++----------------+----------------+--------------+
+| Usługa         | Rozmiar paczki | Wartość [zł] |
++----------------+----------------+--------------+
+| Wysyłka paczki | L              | 16.99        |
++----------------+----------------+--------------+
+
+Uwagi:
+Paczka o numerze 03bc8c0b-d070-4106-96d0-32b46f8c3417

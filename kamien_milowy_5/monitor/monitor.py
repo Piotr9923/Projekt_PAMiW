@@ -23,7 +23,7 @@ channel.queue_declare(queue="errors")
 
 
 def callback(ch, method, properties, body):
-    print("New message: \n" + body.decode())
+    print(body.decode())
     ch.basic_ack(delivery_tag=method.delivery_tag, multiple=False)
 
 

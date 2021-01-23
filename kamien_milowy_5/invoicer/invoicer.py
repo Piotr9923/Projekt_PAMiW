@@ -55,7 +55,7 @@ channel.basic_consume(queue='invoices',
                       on_message_callback=callback)
 
 try:
-    print(' [*] Waiting for messages. To exit press CTRL+C')
+    print(' [*] Waiting for invoices. To exit press CTRL+C')
     channel.start_consuming()
 except KeyboardInterrupt:
     print('Interrupted')
