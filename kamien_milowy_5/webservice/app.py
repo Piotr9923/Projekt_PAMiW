@@ -166,7 +166,6 @@ def add_to_invoices_queue(label):
     else:
         adress = adress.decode()
 
-
     cost = 8.99
     if label["size"] == "M":
         cost = 12.99
@@ -279,8 +278,9 @@ def login():
         errors.append("Błąd połączenia z bazą danych")
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
-        channel.queue_declare(queue="errors")
-        channel.basic_publish(exchange='', routing_key="errors",
+        channel.channel.exchange_declare(exchange="logs", queue="topic")
+
+        channel.basic_publish(exchange='logs', routing_key="webservice.error",
                               body=f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} - Błąd połączenia z bazą danych")
         connection.close()
         document = Document(data={"errors": errors}, links=links)
@@ -291,8 +291,9 @@ def login():
             errors.append("Brak loginu lub hasła")
             connection = pika.BlockingConnection(parameters)
             channel = connection.channel()
-            channel.queue_declare(queue="errors")
-            channel.basic_publish(exchange='', routing_key="errors",
+            channel.channel.exchange_declare(exchange="logs", queue="topic")
+
+            channel.basic_publish(exchange='logs', routing_key="webservice.error",
                                   body=f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} - Brak loginu lub hasła podczas logowania")
             connection.close()
             document = Document(data={"errors": errors}, links=links)
@@ -302,8 +303,9 @@ def login():
             errors.append("Błędny login lub hasło")
             connection = pika.BlockingConnection(parameters)
             channel = connection.channel()
-            channel.queue_declare(queue="errors")
-            channel.basic_publish(exchange='', routing_key="errors",
+            channel.channel.exchange_declare(exchange="logs", queue="topic")
+
+            channel.basic_publish(exchange='logs', routing_key="webservice.error",
                                   body=f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} - Błędne logowanie na konto użytkownika {login}")
             connection.close()
             document = Document(data={"errors": errors}, links=links)

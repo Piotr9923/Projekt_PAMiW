@@ -19,7 +19,13 @@ connection = pika.BlockingConnection(parameters)
 
 channel = connection.channel()
 
-channel.queue_declare(queue="errors")
+channel.exchange_declare(exchange="logs", queue="topic")
+
+result = channel.queue_declare(queue="errors", exclusive=True)
+
+queue_name = result.method.queue
+
+channel.queue_bind(exchange="logs", queue=queue_name, routing_key="*.error")
 
 
 def callback(ch, method, properties, body):
@@ -27,7 +33,7 @@ def callback(ch, method, properties, body):
     ch.basic_ack(delivery_tag=method.delivery_tag, multiple=False)
 
 
-channel.basic_consume(queue='errors',
+channel.basic_consume(queue=queue_name,
                       auto_ack=False,
                       on_message_callback=callback)
 

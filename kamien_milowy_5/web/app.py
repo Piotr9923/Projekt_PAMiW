@@ -104,8 +104,9 @@ def webservice(method, url, json):
         print("Wystąpił błąd: "+str(e), flush=True)
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
-        channel.queue_declare(queue="errors")
-        channel.basic_publish(exchange='', routing_key="errors",
+        channel.channel.exchange_declare(exchange="logs", queue="topic")
+
+        channel.basic_publish(exchange='logs', routing_key="web_app.error",
                               body=f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} - Błąd połączenia z usługą sieciową")
         connection.close()
         return "ERROR"
