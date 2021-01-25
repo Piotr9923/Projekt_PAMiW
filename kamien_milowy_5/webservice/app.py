@@ -278,7 +278,7 @@ def login():
         errors.append("Błąd połączenia z bazą danych")
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
-        channel.channel.exchange_declare(exchange="logs", queue="topic")
+        channel.exchange_declare(exchange="logs", exchange_type="topic")
 
         channel.basic_publish(exchange='logs', routing_key="webservice.error",
                               body=f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} - Błąd połączenia z bazą danych")
@@ -291,7 +291,7 @@ def login():
             errors.append("Brak loginu lub hasła")
             connection = pika.BlockingConnection(parameters)
             channel = connection.channel()
-            channel.channel.exchange_declare(exchange="logs", queue="topic")
+            channel.exchange_declare(exchange="logs", exchange_type="topic")
 
             channel.basic_publish(exchange='logs', routing_key="webservice.error",
                                   body=f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} - Brak loginu lub hasła podczas logowania")
@@ -303,7 +303,7 @@ def login():
             errors.append("Błędny login lub hasło")
             connection = pika.BlockingConnection(parameters)
             channel = connection.channel()
-            channel.channel.exchange_declare(exchange="logs", queue="topic")
+            channel.exchange_declare(exchange="logs", exchange_type="topic")
 
             channel.basic_publish(exchange='logs', routing_key="webservice.error",
                                   body=f"{datetime.now().strftime('%d-%m-%Y %H:%M:%S')} - Błędne logowanie na konto użytkownika {login}")

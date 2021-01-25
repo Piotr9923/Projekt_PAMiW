@@ -19,9 +19,9 @@ connection = pika.BlockingConnection(parameters)
 
 channel = connection.channel()
 
-channel.exchange_declare(exchange="logs", queue="topic")
+channel.exchange_declare(exchange="logs", exchange_type="topic")
 
-result = channel.queue_declare(queue="errors", exclusive=True)
+result = channel.queue_declare(queue="", exclusive=True)
 
 queue_name = result.method.queue
 
