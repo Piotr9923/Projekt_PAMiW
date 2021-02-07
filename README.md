@@ -1,4 +1,7 @@
-## Celem projektu jest stworzenie aplikacji internetowej do zarządzania paczkomatami.
+## Celem projektu jest stworzenie aplikacji internetowej do zarządzania paczkomatami przy użyciu frameworka Flask
+
+Aplikacja była tworzona w ramach pięciu kamieni milowych opisanych poniżej. 
+Ostateczna wersja aplikacji jest dostępna pod linkiem https://fast-falls-00708.herokuapp.com/ 
 
 ### Pierwszy kamień milowy
 W pierwszym kamieniu milowym należało zaimplementować formularz rejestracji z walidacją wprowadzonych danych.
